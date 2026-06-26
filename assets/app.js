@@ -8,7 +8,8 @@ const PROFILE = {
   bio: 'AI × 二次元 × 全栈开发 / 用代码点亮喜欢的角色',
   avatar: '🌸',
   github: 'https://github.com/RainmeoX',
-  csdn: 'https://blog.csdn.net/你的ID'  // ← 改成你的 CSDN
+  csdn: 'https://blog.csdn.net/m0_67166125',
+  elecfans: 'https://bbs.elecfans.com/jishu_2518692_1_1.html'
 };
 
 const PROJECTS = [
@@ -176,7 +177,9 @@ async function renderPost(filename) {
         <span>📁 ${post.category || '未分类'}</span>
         <div class="post-tags">${(post.tags||[]).map(t => `<span class="post-tag">${t}</span>`).join('')}</div>
       </div>
+      ${post.source ? `<a class="source-btn" href="${post.source}" target="_blank">📖 阅读原文 (${post.source.includes('csdn')?'CSDN':post.source.includes('elecfans')?'电子发烧友':'原文'})</a>` : ''}
       <div class="post-content" id="post-content">加载中...</div>
+      ${post.source ? `<a class="source-btn bottom" href="${post.source}" target="_blank">📖 阅读原文 (${post.source.includes('csdn')?'CSDN':post.source.includes('elecfans')?'电子发烧友':'原文'})</a>` : ''}
     </div>
   `;
   try {
@@ -286,10 +289,11 @@ function postItem(p) {
   div.innerHTML = `
     ${p.cover ? `<img class="post-cover" src="${p.cover}" onerror="this.style.display='none'">` : ''}
     <div class="post-body">
-      <div class="post-title">${p.title}</div>
+      <div class="post-title">${p.title} ${p.source ? `<span class="source-badge">${p.source.includes('csdn')?'CSDN':p.source.includes('elecfans')?'电子发烧友':'转载'}</span>` : ''}</div>
       <div class="post-excerpt">${p.excerpt || p.description || ''}</div>
       <div class="post-meta">
         <span>📅 ${p.date}</span>
+        <span>📁 ${p.category || '未分类'}</span>
         <div class="post-tags">${(p.tags||[]).map(t => `<span class="post-tag">${t}</span>`).join('')}</div>
       </div>
     </div>
