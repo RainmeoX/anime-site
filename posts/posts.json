@@ -1,0 +1,26 @@
+[
+  {
+    "title": "用 Qwen 给明日方舟干员做个 AI 助手",
+    "date": "2026-06-25",
+    "category": "AI 应用",
+    "tags": ["AI", "Qwen", "明日方舟", "RAG"],
+    "file": "arknights-qwen-assistant.md",
+    "excerpt": "从干员资料数据集到 RAG 问答系统，记录我用 Qwen 模型给明日方舟做干员助手的全过程，包括数据整理、向量检索、Prompt 工程和前端搭建。"
+  },
+  {
+    "title": "魅蓝 Note2 折腾记：从刷机失败到部署个人博客",
+    "date": "2026-06-26",
+    "category": "折腾",
+    "tags": ["折腾", "Android", "Termux", "博客"],
+    "file": "note2-blog-journey.md",
+    "excerpt": "一台 2015 年的魅蓝 Note2，一台刷废的 MX4 Pro，一段从刷机到部署个人博客的折腾之旅。Termux、KSWeb、内网穿透，老设备的第二春。"
+  },
+  {
+    "title": "绝区零「仪玄」角色助手：从数据到对话",
+    "date": "2026-06-20",
+    "category": "AI 应用",
+    "tags": ["AI", "绝区零", "仪玄", "LoRA"],
+    "file": "zzz-yixuan-assistant.md",
+    "excerpt": "绝区零的仪玄是我最喜欢的角色之一。这篇文章记录我如何整理仪玄的对话数据集，用 LoRA 微调小模型，让她能用仪玄的语气说话。"
+  }
+]

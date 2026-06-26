@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RainmeoX · 个人博客</title>
+<meta name="description" content="RainmeoX 的个人博客 - AI × 二次元 × 全栈开发">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>">
+</head>
+<body>
+<!-- 樱花飘落容器 -->
+<div id="sakura-container"></div>
+
+<!-- 顶部导航 -->
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="#/" class="nav-logo">🌸 RainmeoX</a>
+    <div class="nav-links">
+      <a href="#/" data-route="/">首页</a>
+      <a href="#/blog" data-route="/blog">博客</a>
+      <a href="#/tags" data-route="/tags">标签</a>
+      <a href="#/archive" data-route="/archive">归档</a>
+      <a href="#/about" data-route="/about">关于</a>
+    </div>
+    <div class="nav-actions">
+      <button id="search-btn" title="搜索">🔍</button>
+      <button id="theme-btn" title="切换主题">🌙</button>
+    </div>
+  </div>
+</nav>
+
+<!-- 主内容区 -->
+<main id="app" class="container"></main>
+
+<!-- 搜索弹窗 -->
+<div id="search-modal" class="modal">
+  <div class="modal-content">
+    <input type="text" id="search-input" placeholder="搜索文章..." autocomplete="off">
+    <div id="search-results"></div>
+  </div>
+</div>
+
+<!-- 页脚 -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-left">
+      <p>🌸 RainmeoX · 2026</p>
+      <p class="footer-sub">用代码点亮喜欢的角色</p>
+    </div>
+    <div class="footer-right">
+      <a href="https://github.com/RainmeoX" target="_blank">GitHub</a>
+      <a href="https://blog.csdn.net/你的ID" target="_blank">CSDN</a>
+    </div>
+  </div>
+</footer>
+
+<!-- 第三方库 -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
