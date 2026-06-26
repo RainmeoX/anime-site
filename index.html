@@ -31,7 +31,18 @@
 </nav>
 
 <!-- 主内容区 -->
-<main id="app" class="container"></main>
+<main id="app" class="container">
+  <div class="layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="main-content" id="main-content"></div>
+  </div>
+</main>
+
+<!-- 返回顶部 -->
+<button id="back-to-top" title="返回顶部">↑</button>
+
+<!-- 阅读进度条 -->
+<div id="reading-progress"></div>
 
 <!-- 搜索弹窗 -->
 <div id="search-modal" class="modal">
@@ -58,6 +69,18 @@
 
 <!-- 第三方库 -->
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
+<script>
+  marked.setOptions({
+    highlight: function(code, lang) {
+      if (lang && hljs.getLanguage(lang)) {
+        return hljs.highlight(code, {language: lang}).value;
+      }
+      return hljs.highlightAuto(code).value;
+    }
+  });
+</script>
 <script src="assets/app.js"></script>
 </body>
 </html>

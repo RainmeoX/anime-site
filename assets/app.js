@@ -9,7 +9,10 @@ const PROFILE = {
   avatar: '🌸',
   github: 'https://github.com/RainmeoX',
   csdn: 'https://blog.csdn.net/m0_67166125',
-  elecfans: 'https://bbs.elecfans.com/jishu_2518692_1_1.html'
+  elecfans: 'https://bbs.elecfans.com/jishu_2518692_1_1.html',
+  location: '中国',
+  skills: ['Python', 'PyTorch', 'LoRA 微调', 'ROCm', 'FastAPI', 'Vue', 'JavaScript', 'HTML/CSS'],
+  interests: ['明日方舟', '绝区零', 'AI 助手', '老设备折腾', '二次元']
 };
 
 const PROJECTS = [
@@ -37,7 +40,30 @@ async function init() {
   setupSearch();
   setupThemeToggle();
   setupSakura();
+  setupBackToTop();
+  setupReadingProgress();
   fetchGitHubStars();
+}
+
+// ---------- 返回顶部 ----------
+function setupBackToTop() {
+  const btn = document.getElementById('back-to-top');
+  window.addEventListener('scroll', () => {
+    btn.classList.toggle('show', window.scrollY > 400);
+  });
+  btn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+
+// ---------- 阅读进度条 ----------
+function setupReadingProgress() {
+  const bar = document.getElementById('reading-progress');
+  window.addEventListener('scroll', () => {
+    const h = document.documentElement;
+    const scrolled = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+    bar.style.width = scrolled + '%';
+  });
 }
 
 // ---------- 樱花飘落 ----------
@@ -89,8 +115,11 @@ function setupRouter() {
 
 function render() {
   const hash = window.location.hash.slice(1) || '/';
-  const app = document.getElementById('app');
-  app.innerHTML = '';
+  const main = document.getElementById('main-content');
+  const sidebar = document.getElementById('sidebar');
+
+  // 渲染侧边栏（所有页面都显示）
+  renderSidebar(sidebar);
 
   // 高亮导航
   document.querySelectorAll('.nav-links a').forEach(a => {
@@ -98,60 +127,110 @@ function render() {
   });
 
   if (hash === '/' || hash === '') {
-    renderHome();
+    renderHome(main);
   } else if (hash === '/blog') {
-    renderBlogList();
+    renderBlogList(main);
   } else if (hash.startsWith('/post/')) {
-    renderPost(decodeURIComponent(hash.slice(6)));
+    renderPost(decodeURIComponent(hash.slice(6)), main);
   } else if (hash === '/tags') {
-    renderTags();
+    renderTags(main);
   } else if (hash.startsWith('/tag/')) {
-    renderTagPosts(decodeURIComponent(hash.slice(5)));
+    renderTagPosts(decodeURIComponent(hash.slice(5)), main);
   } else if (hash === '/archive') {
-    renderArchive();
+    renderArchive(main);
   } else if (hash === '/about') {
-    renderAbout();
+    renderAbout(main);
   } else {
-    app.innerHTML = '<div class="empty"><div class="emoji">🌸</div><p>页面不存在</p></div>';
+    main.innerHTML = '<div class="empty"><div class="emoji">🌸</div><p>页面不存在</p></div>';
   }
   window.scrollTo(0, 0);
 }
 
-// ---------- 首页 ----------
-function renderHome() {
-  const app = document.getElementById('app');
-  app.innerHTML = `
-    <div class="hero">
-      <div class="hero-avatar">${PROFILE.avatar}</div>
-      <h1>${PROFILE.name}</h1>
-      <p class="bio">${PROFILE.bio}</p>
-      <div class="hero-links">
-        <a href="${PROFILE.github}" target="_blank" class="btn-github">📦 GitHub</a>
-        <a href="${PROFILE.csdn}" target="_blank" class="btn-csdn">📝 CSDN</a>
-        <a href="#/blog" class="btn-csdn">📚 博客</a>
+// ---------- 侧边栏 ----------
+function renderSidebar(el) {
+  const tagCount = {};
+  POSTS.forEach(p => (p.tags||[]).forEach(t => tagCount[t] = (tagCount[t]||0)+1));
+  const topTags = Object.entries(tagCount).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  const categories = [...new Set(POSTS.map(p=>p.category).filter(Boolean))];
+
+  el.innerHTML = `
+    <div class="profile-card">
+      <div class="profile-avatar">${PROFILE.avatar}</div>
+      <h3 class="profile-name">${PROFILE.name}</h3>
+      <p class="profile-bio">${PROFILE.bio}</p>
+      <div class="profile-location">📍 ${PROFILE.location}</div>
+      <div class="profile-stats">
+        <div class="stat"><span class="num">${POSTS.length}</span><span class="label">文章</span></div>
+        <div class="stat"><span class="num">${PROJECTS.length}</span><span class="label">项目</span></div>
+        <div class="stat"><span class="num">${Object.keys(tagCount).length}</span><span class="label">标签</span></div>
+      </div>
+      <div class="profile-links">
+        <a href="${PROFILE.github}" target="_blank" title="GitHub">📦</a>
+        <a href="${PROFILE.csdn}" target="_blank" title="CSDN">📝</a>
+        <a href="${PROFILE.elecfans}" target="_blank" title="电子发烧友">💡</a>
       </div>
     </div>
+
+    <div class="side-card">
+      <h4 class="side-title">🛠 技能</h4>
+      <div class="skill-tags">
+        ${PROFILE.skills.map(s => `<span class="skill-tag">${s}</span>`).join('')}
+      </div>
+    </div>
+
+    <div class="side-card">
+      <h4 class="side-title">💖 兴趣</h4>
+      <div class="skill-tags">
+        ${PROFILE.interests.map(s => `<span class="skill-tag interest">${s}</span>`).join('')}
+      </div>
+    </div>
+
+    <div class="side-card">
+      <h4 class="side-title">🏷 热门标签</h4>
+      <div class="tag-cloud">
+        ${topTags.map(([t,c]) => `<a href="#/tag/${encodeURIComponent(t)}" class="cloud-tag">${t}<sup>${c}</sup></a>`).join('')}
+      </div>
+    </div>
+
+    <div class="side-card">
+      <h4 class="side-title">📂 分类</h4>
+      <div class="category-list">
+        ${categories.map(cat => {
+          const count = POSTS.filter(p=>p.category===cat).length;
+          return `<a href="#/blog" class="cat-item"><span>${cat}</span><span class="cat-count">${count}</span></a>`;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// ---------- 首页 ----------
+function renderHome(el) {
+  el.innerHTML = `
+    <div class="welcome-banner">
+      <h2>👋 欢迎来到我的小窝</h2>
+      <p>这里记录我的 AI 微调实践、二次元项目和老设备折腾记</p>
+    </div>
+
     <div class="section">
-      <h2 class="section-title">最新文章</h2>
+      <h2 class="section-title">📌 最新文章 <a href="#/blog" class="more-link">查看全部 →</a></h2>
       <div class="post-list" id="recent-posts"></div>
     </div>
+
     <div class="section">
-      <h2 class="section-title">开源项目</h2>
+      <h2 class="section-title">⭐ 精选项目 <a href="${PROFILE.github}" target="_blank" class="more-link">GitHub →</a></h2>
       <div class="projects-grid" id="projects-grid"></div>
     </div>
   `;
-  // 最新文章（取前3篇）
   const recent = document.getElementById('recent-posts');
-  POSTS.slice(0, 3).forEach(p => recent.appendChild(postItem(p)));
-  // 项目
+  POSTS.slice(0, 4).forEach(p => recent.appendChild(postItem(p)));
   const grid = document.getElementById('projects-grid');
-  PROJECTS.forEach(p => grid.appendChild(projectCard(p)));
+  PROJECTS.slice(0, 6).forEach(p => grid.appendChild(projectCard(p)));
 }
 
 // ---------- 博客列表 ----------
-function renderBlogList() {
-  const app = document.getElementById('app');
-  app.innerHTML = `<div class="section"><h2 class="section-title">全部文章</h2><div class="post-list" id="all-posts"></div></div>`;
+function renderBlogList(el) {
+  el.innerHTML = `<div class="section"><h2 class="section-title">全部文章 <span class="count-badge">${POSTS.length} 篇</span></h2><div class="post-list" id="all-posts"></div></div>`;
   const list = document.getElementById('all-posts');
   if (POSTS.length === 0) {
     list.innerHTML = '<div class="empty"><div class="emoji">📝</div><p>还没有文章</p></div>';
@@ -161,14 +240,13 @@ function renderBlogList() {
 }
 
 // ---------- 文章详情 ----------
-async function renderPost(filename) {
-  const app = document.getElementById('app');
+async function renderPost(filename, el) {
   const post = POSTS.find(p => p.file === filename);
   if (!post) {
-    app.innerHTML = '<div class="empty"><div class="emoji">🌸</div><p>文章不存在</p></div>';
+    el.innerHTML = '<div class="empty"><div class="emoji">🌸</div><p>文章不存在</p></div>';
     return;
   }
-  app.innerHTML = `
+  el.innerHTML = `
     <div class="post-detail">
       <a class="back-btn" href="#/blog">← 返回列表</a>
       <h1>${post.title}</h1>
@@ -186,18 +264,37 @@ async function renderPost(filename) {
     const res = await fetch('posts/' + post.file);
     const md = await res.text();
     document.getElementById('post-content').innerHTML = marked.parse(md);
+    // 渲染后生成 TOC
+    generateTOC(el);
   } catch(e) {
     document.getElementById('post-content').innerHTML = '<p>文章加载失败</p>';
   }
 }
 
+// ---------- 生成目录 TOC ----------
+function generateTOC(el) {
+  const content = document.getElementById('post-content');
+  if (!content) return;
+  const headings = content.querySelectorAll('h2, h3');
+  if (headings.length < 3) return; // 少于3个标题不显示
+  const toc = document.createElement('div');
+  toc.className = 'post-toc';
+  toc.innerHTML = '<h4>📑 目录</h4><ul>' + 
+    Array.from(headings).map((h, i) => {
+      h.id = `heading-${i}`;
+      const indent = h.tagName === 'H3' ? 'style="padding-left:16px"' : '';
+      return `<li ${indent}><a href="#heading-${i}" onclick="document.getElementById('heading-${i}').scrollIntoView({behavior:'smooth'});return false">${h.textContent}</a></li>`;
+    }).join('') + '</ul>';
+  const detail = el.querySelector('.post-detail');
+  detail.insertBefore(toc, document.getElementById('post-content'));
+}
+
 // ---------- 标签云 ----------
-function renderTags() {
-  const app = document.getElementById('app');
+function renderTags(el) {
   const tagCount = {};
   POSTS.forEach(p => (p.tags||[]).forEach(t => tagCount[t] = (tagCount[t]||0)+1));
   const tags = Object.keys(tagCount).sort((a,b) => tagCount[b]-tagCount[a]);
-  app.innerHTML = `
+  el.innerHTML = `
     <div class="section">
       <h2 class="section-title">标签云</h2>
       <div class="tags-cloud">
@@ -208,10 +305,9 @@ function renderTags() {
 }
 
 // ---------- 标签文章 ----------
-function renderTagPosts(tag) {
-  const app = document.getElementById('app');
+function renderTagPosts(tag, el) {
   const filtered = POSTS.filter(p => (p.tags||[]).includes(tag));
-  app.innerHTML = `<div class="section"><h2 class="section-title">标签: ${tag} (${filtered.length})</h2><div class="post-list" id="tag-posts"></div></div>`;
+  el.innerHTML = `<div class="section"><h2 class="section-title">标签: ${tag} <span class="count-badge">${filtered.length} 篇</span></h2><div class="post-list" id="tag-posts"></div></div>`;
   const list = document.getElementById('tag-posts');
   if (filtered.length === 0) {
     list.innerHTML = '<div class="empty"><div class="emoji">🏷️</div><p>该标签下没有文章</p></div>';
@@ -221,8 +317,7 @@ function renderTagPosts(tag) {
 }
 
 // ---------- 归档 ----------
-function renderArchive() {
-  const app = document.getElementById('app');
+function renderArchive(el) {
   const byYear = {};
   POSTS.forEach(p => {
     const y = new Date(p.date).getFullYear();
@@ -230,7 +325,7 @@ function renderArchive() {
     byYear[y].push(p);
   });
   const years = Object.keys(byYear).sort((a,b) => b-a);
-  app.innerHTML = `<div class="section"><h2 class="section-title">归档</h2><div id="archive-list"></div></div>`;
+  el.innerHTML = `<div class="section"><h2 class="section-title">归档</h2><div id="archive-list"></div></div>`;
   const list = document.getElementById('archive-list');
   if (POSTS.length === 0) {
     list.innerHTML = '<div class="empty"><div class="emoji">📚</div><p>还没有文章</p></div>';
@@ -238,7 +333,7 @@ function renderArchive() {
   }
   years.forEach(y => {
     const div = document.createElement('div');
-    div.innerHTML = `<div class="archive-year">${y}</div>`;
+    div.innerHTML = `<div class="archive-year">${y} <span class="count-badge">${byYear[y].length} 篇</span></div>`;
     byYear[y].forEach(p => {
       const item = document.createElement('div');
       item.className = 'archive-item';
@@ -250,9 +345,8 @@ function renderArchive() {
 }
 
 // ---------- 关于 ----------
-function renderAbout() {
-  const app = document.getElementById('app');
-  app.innerHTML = `
+function renderAbout(el) {
+  el.innerHTML = `
     <div class="about-content">
       <h2>👋 关于我</h2>
       <p>${PROFILE.bio}</p>
