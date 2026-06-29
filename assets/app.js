@@ -7,7 +7,7 @@
 const PROFILE = {
   name: 'RainmeoX',
   bio: '大模型微调 · 推理部署 · 嵌入式 AI · 全栈开发',
-  avatar: '🌸',
+  avatar: 'assets/images/avatar.jpg',
   github: 'https://github.com/RainmeoX',
   csdn: 'https://blog.csdn.net/m0_67166125',
   blog: 'https://www.rainmeo.xyz',
