@@ -1,31 +1,28 @@
 /* ============================================
-   RainmeoX 二次元博客 · 主逻辑
+   RainmeoX 技术博客 · 主逻辑
    ============================================ */
 
 // ---------- 配置 ----------
 const PROFILE = {
   name: 'RainmeoX',
-  bio: 'AI × 二次元 × 全栈开发 / 用代码点亮喜欢的角色',
-  avatar: '🌸',
+  bio: '大模型微调 · 推理部署 · 嵌入式 AI · 全栈开发',
   github: 'https://github.com/RainmeoX',
   csdn: 'https://blog.csdn.net/m0_67166125',
-  elecfans: 'https://bbs.elecfans.com/jishu_2518692_1_1.html',
-  location: '中国',
-  skills: ['Python', 'PyTorch', 'LoRA 微调', 'ROCm', 'FastAPI', 'Vue', 'JavaScript', 'HTML/CSS'],
-  interests: ['明日方舟', '绝区零', 'AI 助手', '老设备折腾', '二次元']
+  blog: 'https://www.rainmeo.xyz',
+  location: '中国 · 深圳',
+  skills: ['Python', 'PyTorch', 'LoRA 微调', 'vLLM', 'ROCm', 'Transformers', 'ChromaDB', 'K230', 'MicroPython', 'JavaScript', 'HTML/CSS', 'Selenium', 'Flask'],
+  interests: ['大模型微调', '推理部署', 'RAG 应用', '嵌入式 AI', '网络安全', '自动化工具']
 };
 
 const PROJECTS = [
-  { name: 'arknights-qwen-assistant', desc: '明日方舟干员问答助手', lang: 'Python', stars: 0 },
-  { name: 'arknights-dataset', desc: '明日方舟干员资料数据集 | 干员信息、技能、档案多源整理', lang: 'Python', stars: 0 },
-  { name: 'zzz-yixuan-assistant', desc: '绝区零「仪玄」角色助手后端', lang: 'Python', stars: 0 },
-  { name: 'zzz-yixuan-webui', desc: '绝区零「仪玄」角色助手前端', lang: 'JavaScript', stars: 0 },
-  { name: 'zzz-yixuan-dataset', desc: '绝区零仪玄角色资料数据集', lang: 'Markdown', stars: 0 },
-  { name: 'gemma4-emotion-lora-rocm', desc: 'Gemma 4 E4B 情绪分类微调', lang: 'Python', stars: 0 },
-  { name: 'K230-Vision-System', desc: '基于 K230 AI 芯片的视觉检测系统', lang: 'C++', stars: 0 },
-  { name: 'Web-Security-Learning', desc: '网络安全学习项目', lang: 'Markdown', stars: 0 },
-  { name: 'wechat-mini-program', desc: '青智益村微信小程序', lang: 'JavaScript', stars: 0 },
-  { name: 'auto-publisher', desc: '自动发布与数据扒取工具集', lang: 'Python', stars: 0 }
+  { name: 'zzz-yixuan-assistant', desc: '基于 Qwen3-4B + LoRA 微调的角色风格化对话系统后端，vLLM 部署 + RAG 检索 + 防 OOC 校验', lang: 'Python', stars: 0 },
+  { name: 'zzz-yixuan-webui', desc: '纯原生 HTML/CSS/JS 打造的对话助手前端，零依赖，支持桌面/平板/手机三档响应式布局', lang: 'CSS', stars: 0 },
+  { name: 'arknights-qwen-assistant', desc: '基于 Qwen3-0.6B + LoRA 的垂直知识问答系统，133 个实体 8846 条问答，8 分钟训练完成', lang: 'Python', stars: 0 },
+  { name: 'gemma4-emotion-lora-rocm', desc: 'Gemma4-E4B 情绪分类 LoRA 微调，AMD ROCm 单卡 17 分钟训练，准确率 0.625→0.915', lang: 'Python', stars: 0 },
+  { name: 'K230-Vision-System', desc: '基于 K230 AI 芯片的多功能嵌入式视觉检测系统，三角形/圆形/矩形检测 + 二维码识别 + UART 通信', lang: 'C++', stars: 0 },
+  { name: 'Web-Security-Learning', desc: '网络安全学习项目，Web 安全 7 主题 + 应急响应 4 主题，配套 Flask 靶场与攻击脚本', lang: 'Markdown', stars: 0 },
+  { name: 'auto-publisher', desc: '自动化发布与数据采集工具集，CSDN 自动发布 + 飞书/雨课堂文档采集 + GitHub 仓库管理', lang: 'Python', stars: 0 },
+  { name: 'anime-site', desc: '个人博客网站，纯原生 HTML/CSS/JS 单文件实现，Markdown 渲染 + 代码高亮 + 全文搜索', lang: 'CSS', stars: 0 },
 ];
 
 // ---------- 全局状态 ----------
@@ -34,65 +31,19 @@ let CURRENT_THEME = localStorage.getItem('theme') || 'dark';
 
 // ---------- 初始化 ----------
 async function init() {
-  applyTheme();
+  applyTheme(CURRENT_THEME);
   await loadPosts();
-  setupRouter();
-  setupSearch();
-  setupThemeToggle();
-  setupSakura();
-  setupBackToTop();
-  setupReadingProgress();
+  router();
+  window.addEventListener('hashchange', router);
+  bindEvents();
   fetchGitHubStars();
 }
 
-// ---------- 返回顶部 ----------
-function setupBackToTop() {
-  const btn = document.getElementById('back-to-top');
-  window.addEventListener('scroll', () => {
-    btn.classList.toggle('show', window.scrollY > 400);
-  });
-  btn.addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
-}
-
-// ---------- 阅读进度条 ----------
-function setupReadingProgress() {
-  const bar = document.getElementById('reading-progress');
-  window.addEventListener('scroll', () => {
-    const h = document.documentElement;
-    const scrolled = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
-    bar.style.width = scrolled + '%';
-  });
-}
-
-// ---------- 樱花飘落 ----------
-function setupSakura() {
-  const container = document.getElementById('sakura-container');
-  const chars = ['🌸','🌺','💮','🌷'];
-  for (let i = 0; i < 12; i++) {
-    const s = document.createElement('div');
-    s.className = 'sakura';
-    s.textContent = chars[Math.floor(Math.random()*chars.length)];
-    s.style.left = Math.random()*100 + '%';
-    s.style.animationDuration = (10 + Math.random()*10) + 's';
-    s.style.animationDelay = Math.random()*10 + 's';
-    s.style.fontSize = (12 + Math.random()*14) + 'px';
-    container.appendChild(s);
-  }
-}
-
 // ---------- 主题 ----------
-function applyTheme() {
-  document.documentElement.setAttribute('data-theme', CURRENT_THEME);
-  document.getElementById('theme-btn').textContent = CURRENT_THEME === 'dark' ? '🌙' : '☀️';
-}
-function setupThemeToggle() {
-  document.getElementById('theme-btn').addEventListener('click', () => {
-    CURRENT_THEME = CURRENT_THEME === 'dark' ? 'light' : 'dark';
-    localStorage.setItem('theme', CURRENT_THEME);
-    applyTheme();
-  });
+function applyTheme(theme) {
+  CURRENT_THEME = theme;
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('theme', theme);
 }
 
 // ---------- 加载文章 ----------
@@ -100,356 +51,309 @@ async function loadPosts() {
   try {
     const res = await fetch('posts/posts.json');
     POSTS = await res.json();
-    POSTS.sort((a,b) => new Date(b.date) - new Date(a.date));
-  } catch(e) {
-    console.error('加载文章失败:', e);
+    POSTS.sort((a, b) => new Date(b.date) - new Date(a.date));
+  } catch (e) {
     POSTS = [];
   }
 }
 
 // ---------- 路由 ----------
-function setupRouter() {
-  window.addEventListener('hashchange', render);
-  render();
-}
+function router() {
+  const hash = location.hash.slice(1) || '/';
+  const main = document.getElementById('main');
+  window.scrollTo(0, 0);
 
-function render() {
-  const hash = window.location.hash.slice(1) || '/';
-  const main = document.getElementById('main-content');
-  const sidebar = document.getElementById('sidebar');
-
-  // 渲染侧边栏（所有页面都显示）
-  renderSidebar(sidebar);
-
-  // 高亮导航
+  // 更新导航高亮
   document.querySelectorAll('.nav-links a').forEach(a => {
     a.classList.toggle('active', a.dataset.route === hash);
   });
 
-  if (hash === '/' || hash === '') {
+  // 关闭移动端菜单
+  document.getElementById('navLinks').classList.remove('open');
+
+  if (hash === '/') {
     renderHome(main);
   } else if (hash === '/blog') {
-    renderBlogList(main);
-  } else if (hash.startsWith('/post/')) {
-    renderPost(decodeURIComponent(hash.slice(6)), main);
+    renderBlog(main);
+  } else if (hash === '/projects') {
+    renderProjects(main);
   } else if (hash === '/tags') {
     renderTags(main);
-  } else if (hash.startsWith('/tag/')) {
-    renderTagPosts(decodeURIComponent(hash.slice(5)), main);
-  } else if (hash === '/archive') {
-    renderArchive(main);
   } else if (hash === '/about') {
     renderAbout(main);
+  } else if (hash.startsWith('/post/')) {
+    const file = decodeURIComponent(hash.slice(6));
+    renderPost(main, file);
+  } else if (hash.startsWith('/tag/')) {
+    const tag = decodeURIComponent(hash.slice(5));
+    renderBlog(main, tag);
   } else {
-    main.innerHTML = '<div class="empty"><div class="emoji">🌸</div><p>页面不存在</p></div>';
+    renderHome(main);
   }
-  window.scrollTo(0, 0);
-}
-
-// ---------- 侧边栏 ----------
-function renderSidebar(el) {
-  const tagCount = {};
-  POSTS.forEach(p => (p.tags||[]).forEach(t => tagCount[t] = (tagCount[t]||0)+1));
-  const topTags = Object.entries(tagCount).sort((a,b)=>b[1]-a[1]).slice(0,12);
-  const categories = [...new Set(POSTS.map(p=>p.category).filter(Boolean))];
-
-  el.innerHTML = `
-    <div class="profile-card">
-      <div class="profile-avatar">${PROFILE.avatar}</div>
-      <h3 class="profile-name">${PROFILE.name}</h3>
-      <p class="profile-bio">${PROFILE.bio}</p>
-      <div class="profile-location">📍 ${PROFILE.location}</div>
-      <div class="profile-stats">
-        <div class="stat"><span class="num">${POSTS.length}</span><span class="label">文章</span></div>
-        <div class="stat"><span class="num">${PROJECTS.length}</span><span class="label">项目</span></div>
-        <div class="stat"><span class="num">${Object.keys(tagCount).length}</span><span class="label">标签</span></div>
-      </div>
-      <div class="profile-links">
-        <a href="${PROFILE.github}" target="_blank" title="GitHub">📦</a>
-        <a href="${PROFILE.csdn}" target="_blank" title="CSDN">📝</a>
-        <a href="${PROFILE.elecfans}" target="_blank" title="电子发烧友">💡</a>
-      </div>
-    </div>
-
-    <div class="side-card">
-      <h4 class="side-title">🛠 技能</h4>
-      <div class="skill-tags">
-        ${PROFILE.skills.map(s => `<span class="skill-tag">${s}</span>`).join('')}
-      </div>
-    </div>
-
-    <div class="side-card">
-      <h4 class="side-title">💖 兴趣</h4>
-      <div class="skill-tags">
-        ${PROFILE.interests.map(s => `<span class="skill-tag interest">${s}</span>`).join('')}
-      </div>
-    </div>
-
-    <div class="side-card">
-      <h4 class="side-title">🏷 热门标签</h4>
-      <div class="tag-cloud">
-        ${topTags.map(([t,c]) => `<a href="#/tag/${encodeURIComponent(t)}" class="cloud-tag">${t}<sup>${c}</sup></a>`).join('')}
-      </div>
-    </div>
-
-    <div class="side-card">
-      <h4 class="side-title">📂 分类</h4>
-      <div class="category-list">
-        ${categories.map(cat => {
-          const count = POSTS.filter(p=>p.category===cat).length;
-          return `<a href="#/blog" class="cat-item"><span>${cat}</span><span class="cat-count">${count}</span></a>`;
-        }).join('')}
-      </div>
-    </div>
-  `;
 }
 
 // ---------- 首页 ----------
 function renderHome(el) {
+  const recentPosts = POSTS.slice(0, 5);
+  const featuredProjects = PROJECTS.slice(0, 6);
+
   el.innerHTML = `
-    <div class="welcome-banner">
-      <h2>👋 欢迎来到我的小窝</h2>
-      <p>这里记录我的 AI 微调实践、二次元项目和老设备折腾记</p>
-    </div>
+    <section class="hero">
+      <h1>专注 <span class="accent">大模型微调</span> 与<br>嵌入式 AI 工程实践</h1>
+      <p class="tagline">${PROFILE.bio}。这里记录我的项目实战、技术笔记与踩坑经验。</p>
+      <div class="hero-meta">
+        <span>📍 ${PROFILE.location}</span>
+        <span>📦 ${PROJECTS.length} 个开源项目</span>
+        <span>📝 ${POSTS.length} 篇文章</span>
+      </div>
+    </section>
 
-    <div class="section">
-      <h2 class="section-title">📌 最新文章 <a href="#/blog" class="more-link">查看全部 →</a></h2>
-      <div class="post-list" id="recent-posts"></div>
-    </div>
+    <section style="margin-bottom: 48px;">
+      <div class="section-header">
+        <h2 class="section-title">最新文章</h2>
+        <a href="#/blog" class="section-more">查看全部 →</a>
+      </div>
+      <div class="post-list">
+        ${recentPosts.map(p => postCard(p)).join('')}
+      </div>
+    </section>
 
-    <div class="section">
-      <h2 class="section-title">⭐ 精选项目 <a href="${PROFILE.github}" target="_blank" class="more-link">GitHub →</a></h2>
-      <div class="projects-grid" id="projects-grid"></div>
-    </div>
+    <section>
+      <div class="section-header">
+        <h2 class="section-title">精选项目</h2>
+        <a href="#/projects" class="section-more">查看全部 →</a>
+      </div>
+      <div class="project-grid">
+        ${featuredProjects.map(p => projectCard(p)).join('')}
+      </div>
+    </section>
   `;
-  const recent = document.getElementById('recent-posts');
-  POSTS.slice(0, 4).forEach(p => recent.appendChild(postItem(p)));
-  const grid = document.getElementById('projects-grid');
-  PROJECTS.slice(0, 6).forEach(p => grid.appendChild(projectCard(p)));
 }
 
 // ---------- 博客列表 ----------
-function renderBlogList(el) {
-  el.innerHTML = `<div class="section"><h2 class="section-title">全部文章 <span class="count-badge">${POSTS.length} 篇</span></h2><div class="post-list" id="all-posts"></div></div>`;
-  const list = document.getElementById('all-posts');
-  if (POSTS.length === 0) {
-    list.innerHTML = '<div class="empty"><div class="emoji">📝</div><p>还没有文章</p></div>';
-    return;
-  }
-  POSTS.forEach(p => list.appendChild(postItem(p)));
+function renderBlog(el, filterTag) {
+  const posts = filterTag ? POSTS.filter(p => (p.tags || []).includes(filterTag)) : POSTS;
+  const title = filterTag ? `标签：${filterTag}` : '全部文章';
+
+  el.innerHTML = `
+    <div class="section-header">
+      <h2 class="section-title">${title}</h2>
+      <span style="font-size:13px;color:var(--text-tertiary);">${posts.length} 篇</span>
+    </div>
+    ${posts.length > 0
+      ? `<div class="post-list">${posts.map(p => postCard(p)).join('')}</div>`
+      : `<div class="empty-state"><div class="empty-icon">📝</div><p>暂无文章</p></div>`
+    }
+  `;
+}
+
+// ---------- 项目页 ----------
+function renderProjects(el) {
+  el.innerHTML = `
+    <div class="section-header">
+      <h2 class="section-title">开源项目</h2>
+      <a href="${PROFILE.github}" target="_blank" class="section-more">GitHub →</a>
+    </div>
+    <div class="project-grid">
+      ${PROJECTS.map(p => projectCard(p)).join('')}
+    </div>
+  `;
+}
+
+// ---------- 标签页 ----------
+function renderTags(el) {
+  const tagCount = {};
+  POSTS.forEach(p => {
+    (p.tags || []).forEach(t => { tagCount[t] = (tagCount[t] || 0) + 1; });
+  });
+  const tags = Object.entries(tagCount).sort((a, b) => b[1] - a[1]);
+
+  el.innerHTML = `
+    <div class="section-header">
+      <h2 class="section-title">标签</h2>
+      <span style="font-size:13px;color:var(--text-tertiary);">${tags.length} 个标签</span>
+    </div>
+    <div class="tag-cloud">
+      ${tags.map(([tag, count]) => `
+        <a href="#/tag/${encodeURIComponent(tag)}" class="tag-item">
+          ${tag}<span class="tag-count">${count}</span>
+        </a>
+      `).join('')}
+    </div>
+  `;
+}
+
+// ---------- 关于页 ----------
+function renderAbout(el) {
+  el.innerHTML = `
+    <div class="section-header">
+      <h2 class="section-title">关于我</h2>
+    </div>
+    <div class="about-card">
+      <h2>${PROFILE.name}</h2>
+      <p>${PROFILE.bio}。专注大语言模型微调、高性能推理部署与嵌入式边缘视觉，掌握 Transformer 架构、LoRA 参数高效微调与 vLLM 推理优化技术。基于 AMD ROCm 生态独立完成 Qwen3-4B、Qwen3-0.6B、Gemma4-E4B 三个大模型的 LoRA 微调与部署，具备从数据集构建、模型训练、推理服务到前端 UI 的全链路交付能力。</p>
+      <p>同时具备 K230 嵌入式 AI 芯片视觉算法开发、网络安全实战（Web 安全 + 应急响应）、自动化工具开发经验。注重工程实践与方案落地，所有项目均开源并附详细文档。</p>
+
+      <h3 style="font-size:16px;margin:24px 0 12px;">技术栈</h3>
+      <div class="skill-tags">
+        ${PROFILE.skills.map(s => `<span class="skill-tag">${s}</span>`).join('')}
+      </div>
+
+      <h3 style="font-size:16px;margin:24px 0 12px;">关注方向</h3>
+      <div class="skill-tags">
+        ${PROFILE.interests.map(s => `<span class="skill-tag">${s}</span>`).join('')}
+      </div>
+
+      <div class="links">
+        <a href="${PROFILE.github}" target="_blank">📦 GitHub</a>
+        <a href="${PROFILE.csdn}" target="_blank">📝 CSDN</a>
+        <a href="${PROFILE.blog}" target="_blank">🌐 博客主站</a>
+      </div>
+    </div>
+  `;
 }
 
 // ---------- 文章详情 ----------
-async function renderPost(filename, el) {
-  const post = POSTS.find(p => p.file === filename);
+async function renderPost(el, file) {
+  el.innerHTML = `<div class="empty-state"><div class="empty-icon">⏳</div><p>加载中...</p></div>`;
+
+  const post = POSTS.find(p => p.file === file);
   if (!post) {
-    el.innerHTML = '<div class="empty"><div class="emoji">🌸</div><p>文章不存在</p></div>';
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">404</div><p>文章不存在</p><a href="#/blog" style="display:inline-block;margin-top:16px;">← 返回博客</a></div>`;
     return;
   }
-  el.innerHTML = `
-    <div class="post-detail">
-      <a class="back-btn" href="#/blog">← 返回列表</a>
-      <h1>${post.title}</h1>
-      <div class="meta">
-        <span>📅 ${post.date}</span>
-        <span>📁 ${post.category || '未分类'}</span>
-        <div class="post-tags">${(post.tags||[]).map(t => `<span class="post-tag">${t}</span>`).join('')}</div>
-      </div>
-      ${post.source ? `<a class="source-btn" href="${post.source}" target="_blank">📖 阅读原文 (${post.source.includes('csdn')?'CSDN':post.source.includes('elecfans')?'电子发烧友':'原文'})</a>` : ''}
-      <div class="post-content" id="post-content">加载中...</div>
-      ${post.source ? `<a class="source-btn bottom" href="${post.source}" target="_blank">📖 阅读原文 (${post.source.includes('csdn')?'CSDN':post.source.includes('elecfans')?'电子发烧友':'原文'})</a>` : ''}
-    </div>
-  `;
+
   try {
-    const res = await fetch('posts/' + post.file);
-    const md = await res.text();
-    document.getElementById('post-content').innerHTML = marked.parse(md);
-    // 渲染后生成 TOC
-    generateTOC(el);
-  } catch(e) {
-    document.getElementById('post-content').innerHTML = '<p>文章加载失败</p>';
-  }
-}
+    const res = await fetch(`posts/${file}`);
+    let md = await res.text();
+    // 去掉开头的引用块
+    md = md.replace(/^>\s.*$/m, '').trim();
 
-// ---------- 生成目录 TOC ----------
-function generateTOC(el) {
-  const content = document.getElementById('post-content');
-  if (!content) return;
-  const headings = content.querySelectorAll('h2, h3');
-  if (headings.length < 3) return; // 少于3个标题不显示
-  const toc = document.createElement('div');
-  toc.className = 'post-toc';
-  toc.innerHTML = '<h4>📑 目录</h4><ul>' + 
-    Array.from(headings).map((h, i) => {
-      h.id = `heading-${i}`;
-      const indent = h.tagName === 'H3' ? 'style="padding-left:16px"' : '';
-      return `<li ${indent}><a href="#heading-${i}" onclick="document.getElementById('heading-${i}').scrollIntoView({behavior:'smooth'});return false">${h.textContent}</a></li>`;
-    }).join('') + '</ul>';
-  const detail = el.querySelector('.post-detail');
-  detail.insertBefore(toc, document.getElementById('post-content'));
-}
+    const html = marked.parse(md);
 
-// ---------- 标签云 ----------
-function renderTags(el) {
-  const tagCount = {};
-  POSTS.forEach(p => (p.tags||[]).forEach(t => tagCount[t] = (tagCount[t]||0)+1));
-  const tags = Object.keys(tagCount).sort((a,b) => tagCount[b]-tagCount[a]);
-  el.innerHTML = `
-    <div class="section">
-      <h2 class="section-title">标签云</h2>
-      <div class="tags-cloud">
-        ${tags.map(t => `<a class="tag-cloud-item" href="#/tag/${encodeURIComponent(t)}">${t}<span class="count">${tagCount[t]}</span></a>`).join('')}
-      </div>
-    </div>
-  `;
-}
+    el.innerHTML = `
+      <article class="post-detail">
+        <a href="#/blog" class="back-link">← 返回博客</a>
+        <div class="post-header">
+          <h1 class="post-title-large">${post.title}</h1>
+          <div class="post-meta">
+            <span>📅 ${post.date}</span>
+            <span>📁 ${post.category}</span>
+            ${post.source ? `<span>🔗 <a href="${post.source}" target="_blank">原文链接</a></span>` : ''}
+          </div>
+          ${post.tags && post.tags.length ? `<div class="post-tags" style="margin-top:12px;">${post.tags.map(t => `<a href="#/tag/${encodeURIComponent(t)}" class="tag">${t}</a>`).join('')}</div>` : ''}
+        </div>
+        <div class="post-content">${html}</div>
+      </article>
+    `;
 
-// ---------- 标签文章 ----------
-function renderTagPosts(tag, el) {
-  const filtered = POSTS.filter(p => (p.tags||[]).includes(tag));
-  el.innerHTML = `<div class="section"><h2 class="section-title">标签: ${tag} <span class="count-badge">${filtered.length} 篇</span></h2><div class="post-list" id="tag-posts"></div></div>`;
-  const list = document.getElementById('tag-posts');
-  if (filtered.length === 0) {
-    list.innerHTML = '<div class="empty"><div class="emoji">🏷️</div><p>该标签下没有文章</p></div>';
-    return;
-  }
-  filtered.forEach(p => list.appendChild(postItem(p)));
-}
-
-// ---------- 归档 ----------
-function renderArchive(el) {
-  const byYear = {};
-  POSTS.forEach(p => {
-    const y = new Date(p.date).getFullYear();
-    if (!byYear[y]) byYear[y] = [];
-    byYear[y].push(p);
-  });
-  const years = Object.keys(byYear).sort((a,b) => b-a);
-  el.innerHTML = `<div class="section"><h2 class="section-title">归档</h2><div id="archive-list"></div></div>`;
-  const list = document.getElementById('archive-list');
-  if (POSTS.length === 0) {
-    list.innerHTML = '<div class="empty"><div class="emoji">📚</div><p>还没有文章</p></div>';
-    return;
-  }
-  years.forEach(y => {
-    const div = document.createElement('div');
-    div.innerHTML = `<div class="archive-year">${y} <span class="count-badge">${byYear[y].length} 篇</span></div>`;
-    byYear[y].forEach(p => {
-      const item = document.createElement('div');
-      item.className = 'archive-item';
-      item.innerHTML = `<span class="date">${p.date.slice(5)}</span><a class="title" href="#/post/${encodeURIComponent(p.file)}">${p.title}</a>`;
-      div.appendChild(item);
+    // 代码高亮
+    document.querySelectorAll('pre code').forEach(block => {
+      if (window.hljs) hljs.highlightElement(block);
     });
-    list.appendChild(div);
-  });
+  } catch (e) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><p>加载失败</p></div>`;
+  }
 }
 
-// ---------- 关于 ----------
-function renderAbout(el) {
-  el.innerHTML = `
-    <div class="about-content">
-      <h2>👋 关于我</h2>
-      <p>${PROFILE.bio}</p>
-      <p>一个热爱二次元和代码的开发者，喜欢用 AI 给喜欢的角色做助手。从明日方舟到绝区零，每个喜欢的角色都值得一个专属的智能助手。</p>
-      <h2>🛠️ 技能</h2>
-      <div class="skills">
-        <span class="skill-tag">Python</span>
-        <span class="skill-tag">JavaScript</span>
-        <span class="skill-tag">PyTorch</span>
-        <span class="skill-tag">LoRA 微调</span>
-        <span class="skill-tag">RAG</span>
-        <span class="skill-tag">FastAPI</span>
-        <span class="skill-tag">Vue/React</span>
-        <span class="skill-tag">爬虫</span>
-        <span class="skill-tag">网络安全</span>
-      </div>
-      <h2>📂 项目方向</h2>
-      <p>• 游戏角色 AI 助手（方舟/绝区零）</p>
-      <p>• 小模型微调与边缘部署</p>
-      <p>• 数据扒取与自动化发布</p>
-      <p>• 视觉检测系统</p>
-      <h2>🔗 联系</h2>
-      <p>GitHub: <a href="${PROFILE.github}" target="_blank" style="color:var(--pink)">${PROFILE.github}</a></p>
-      <p>CSDN: <a href="${PROFILE.csdn}" target="_blank" style="color:var(--pink)">${PROFILE.csdn}</a></p>
-    </div>
-  `;
-}
-
-// ---------- 组件 ----------
-function postItem(p) {
-  const div = document.createElement('a');
-  div.className = 'post-item';
-  div.href = `#/post/${encodeURIComponent(p.file)}`;
-  div.innerHTML = `
-    ${p.cover ? `<img class="post-cover" src="${p.cover}" onerror="this.style.display='none'">` : ''}
-    <div class="post-body">
-      <div class="post-title">${p.title} ${p.source ? `<span class="source-badge">${p.source.includes('csdn')?'CSDN':p.source.includes('elecfans')?'电子发烧友':'转载'}</span>` : ''}</div>
-      <div class="post-excerpt">${p.excerpt || p.description || ''}</div>
-      <div class="post-meta">
-        <span>📅 ${p.date}</span>
-        <span>📁 ${p.category || '未分类'}</span>
-        <div class="post-tags">${(p.tags||[]).map(t => `<span class="post-tag">${t}</span>`).join('')}</div>
+// ---------- 文章卡片 ----------
+function postCard(p) {
+  return `
+    <div class="post-card" onclick="location.hash='#/post/${encodeURIComponent(p.file)}'">
+      <div class="post-date">${p.date}</div>
+      <div class="post-body">
+        <div class="post-title">${p.title}</div>
+        <div class="post-excerpt">${p.excerpt || ''}</div>
+        <div class="post-tags">
+          ${(p.tags || []).slice(0, 4).map(t => `<span class="tag">${t}</span>`).join('')}
+        </div>
       </div>
     </div>
   `;
-  return div;
 }
 
+// ---------- 项目卡片 ----------
 function projectCard(p) {
-  const a = document.createElement('a');
-  a.className = 'project-card';
-  a.href = `https://github.com/RainmeoX/${p.name}`;
-  a.target = '_blank';
-  a.innerHTML = `
-    <div class="name">${p.name}</div>
-    <div class="desc">${p.desc}</div>
-    <div class="meta">
-      <span class="lang">${p.lang}</span>
-      <span class="stars" data-repo="${p.name}">⭐ ${p.stars}</span>
-    </div>
+  return `
+    <a href="https://github.com/RainmeoX/${p.name}" target="_blank" class="project-card" data-lang="${p.lang}">
+      <div class="proj-header">
+        <span class="proj-name">${p.name}</span>
+        <span class="proj-lang">${p.lang}</span>
+      </div>
+      <div class="proj-desc">${p.desc}</div>
+      <div class="proj-stars" data-repo="${p.name}">⭐ ${p.stars}</div>
+    </a>
   `;
-  return a;
 }
 
-// ---------- 搜索 ----------
-function setupSearch() {
-  const btn = document.getElementById('search-btn');
-  const modal = document.getElementById('search-modal');
-  const input = document.getElementById('search-input');
-  const results = document.getElementById('search-results');
-
-  btn.addEventListener('click', () => {
-    modal.classList.add('active');
-    input.value = '';
-    results.innerHTML = '';
-    setTimeout(() => input.focus(), 100);
-  });
-  modal.addEventListener('click', e => {
-    if (e.target === modal) modal.classList.remove('active');
-  });
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') modal.classList.remove('active');
-    if (e.ctrlKey && e.key === 'k') { e.preventDefault(); btn.click(); }
+// ---------- 事件绑定 ----------
+function bindEvents() {
+  // 主题切换
+  document.getElementById('themeBtn').addEventListener('click', () => {
+    applyTheme(CURRENT_THEME === 'dark' ? 'light' : 'dark');
   });
 
-  input.addEventListener('input', () => {
-    const q = input.value.trim().toLowerCase();
-    if (!q) { results.innerHTML = ''; return; }
+  // 移动端菜单
+  document.getElementById('navToggle').addEventListener('click', () => {
+    document.getElementById('navLinks').classList.toggle('open');
+  });
+
+  // 搜索
+  const searchModal = document.getElementById('searchModal');
+  const searchInput = document.getElementById('searchInput');
+
+  document.getElementById('searchBtn').addEventListener('click', () => {
+    searchModal.classList.add('active');
+    setTimeout(() => searchInput.focus(), 100);
+  });
+
+  document.getElementById('searchOverlay').addEventListener('click', () => {
+    searchModal.classList.remove('active');
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      searchModal.classList.remove('active');
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      e.preventDefault();
+      searchModal.classList.add('active');
+      setTimeout(() => searchInput.focus(), 100);
+    }
+  });
+
+  // 搜索输入
+  searchInput.addEventListener('input', (e) => {
+    const q = e.target.value.trim().toLowerCase();
+    const results = document.getElementById('searchResults');
+    if (!q) {
+      results.innerHTML = '';
+      return;
+    }
     const matched = POSTS.filter(p =>
       p.title.toLowerCase().includes(q) ||
-      (p.excerpt||'').toLowerCase().includes(q) ||
-      (p.tags||[]).some(t => t.toLowerCase().includes(q))
+      (p.excerpt || '').toLowerCase().includes(q) ||
+      (p.tags || []).some(t => t.toLowerCase().includes(q))
     );
     if (matched.length === 0) {
       results.innerHTML = '<div class="search-result"><div class="excerpt">未找到相关文章</div></div>';
       return;
     }
     results.innerHTML = matched.map(p => `
-      <div class="search-result" onclick="location.hash='#/post/${encodeURIComponent(p.file)}';document.getElementById('search-modal').classList.remove('active')">
+      <div class="search-result" onclick="location.hash='#/post/${encodeURIComponent(p.file)}';document.getElementById('searchModal').classList.remove('active')">
         <div class="title">${p.title}</div>
-        <div class="excerpt">${(p.excerpt||'').slice(0,80)} · ${p.date}</div>
+        <div class="excerpt">${(p.excerpt || '').slice(0, 80)} · ${p.date}</div>
       </div>
     `).join('');
+  });
+
+  // 回到顶部
+  const backToTop = document.getElementById('backToTop');
+  window.addEventListener('scroll', () => {
+    backToTop.classList.toggle('visible', window.scrollY > 400);
+  });
+  backToTop.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 }
 
@@ -463,7 +367,7 @@ async function fetchGitHubStars() {
       const el = document.querySelector(`[data-repo="${repo.name}"]`);
       if (el) el.textContent = `⭐ ${repo.stargazers_count}`;
     });
-  } catch(e) {}
+  } catch (e) {}
 }
 
 // ---------- 启动 ----------
