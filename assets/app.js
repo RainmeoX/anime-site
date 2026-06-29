@@ -30,7 +30,7 @@ const PROJECTS = [
 
 // ---------- 全局状态 ----------
 let POSTS = [];
-let CURRENT_THEME = localStorage.getItem('theme') || 'dark';
+let CURRENT_THEME = localStorage.getItem('theme') || 'light';
 
 // ---------- 初始化 ----------
 async function init() {
@@ -306,7 +306,7 @@ async function renderPost(el, file) {
 function bindEvents() {
   // 主题切换
   document.getElementById('themeBtn').addEventListener('click', () => {
-    CURRENT_THEME = CURRENT_THEME === 'dark' ? 'light' : 'dark';
+    CURRENT_THEME = CURRENT_THEME === 'light' ? 'dark' : 'light';
     applyTheme();
   });
 
