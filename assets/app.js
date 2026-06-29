@@ -4,7 +4,7 @@
    ============================================ */
 
 // ---------- 配置 ----------
-const PROFILE = {
+const DEFAULT_PROFILE = {
   name: 'RainmeoX',
   bio: '大模型微调 · 推理部署 · 嵌入式 AI · 全栈开发',
   avatar: 'assets/images/avatar.jpg',
@@ -16,6 +16,17 @@ const PROFILE = {
   skills: ['Python', 'PyTorch', 'LoRA 微调', 'vLLM', 'ROCm', 'Transformers', 'ChromaDB', 'K230', 'MicroPython', 'JavaScript', 'HTML/CSS', 'Selenium', 'Flask'],
   interests: ['大模型微调', '推理部署', 'RAG 应用', '嵌入式 AI', '网络安全', '自动化工具']
 };
+
+// 动态获取 PROFILE（合并自定义配置）
+function getProfile() {
+  try {
+    const custom = JSON.parse(localStorage.getItem('rainmeo_profile') || '{}');
+    return { ...DEFAULT_PROFILE, ...custom };
+  } catch (e) {
+    return DEFAULT_PROFILE;
+  }
+}
+let PROFILE = getProfile();
 
 const PROJECTS = [
   { name: 'zzz-yixuan-assistant', desc: '基于 Qwen3-4B + LoRA 微调的角色风格化对话系统后端，vLLM 部署 + RAG 检索 + 防 OOC 校验', lang: 'Python', stars: 0 },
@@ -41,6 +52,13 @@ async function init() {
   renderSidebar();
   router();
   fetchGitHubStars();
+  // 监听管理面板的刷新事件
+  window.addEventListener('blog:refresh', async () => {
+    PROFILE = getProfile();  // 重新加载个人资料
+    await loadPosts();
+    renderSidebar();
+    router();
+  });
 }
 
 // ---------- 樱花飘落 ----------
@@ -72,11 +90,20 @@ function applyTheme() {
 async function loadPosts() {
   try {
     const res = await fetch('posts/posts.json');
-    POSTS = await res.json();
-    POSTS.sort((a, b) => new Date(b.date) - new Date(a.date));
+    const builtin = await res.json();
+    // 合并自定义文章（来自管理面板）
+    const custom = JSON.parse(localStorage.getItem('rainmeo_custom_posts') || '[]');
+    POSTS = [...custom, ...builtin];
+    // 置顶的排前面
+    POSTS.sort((a, b) => {
+      if (a.pinned && !b.pinned) return -1;
+      if (!a.pinned && b.pinned) return 1;
+      return new Date(b.date) - new Date(a.date);
+    });
   } catch (e) {
     console.error('加载文章失败', e);
-    POSTS = [];
+    const custom = JSON.parse(localStorage.getItem('rainmeo_custom_posts') || '[]');
+    POSTS = custom;
   }
 }
 
@@ -124,6 +151,7 @@ function router() {
   else if (hash === '/projects') renderProjects(main);
   else if (hash === '/tags') renderTags(main);
   else if (hash === '/about') renderAbout(main);
+  else if (hash === '/admin') { renderAdminPlaceholder(main); openAdmin(); }
   else if (hash.startsWith('/post/')) renderPost(main, decodeURIComponent(hash.slice(6)));
   else renderHome(main);
 
@@ -273,10 +301,18 @@ function renderAbout(el) {
 async function renderPost(el, file) {
   el.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div>加载中...</div>';
   try {
-    const res = await fetch(`posts/${file}`);
-    if (!res.ok) throw new Error('文章不存在');
-    const md = await res.text();
     const post = POSTS.find(p => p.file === file) || {};
+    let md = '';
+    // 优先从自定义文章读取
+    if (post.custom) {
+      const customPosts = JSON.parse(localStorage.getItem('rainmeo_custom_posts') || '[]');
+      const found = customPosts.find(p => p.file === file);
+      md = found ? found.content : '';
+    } else {
+      const res = await fetch(`posts/${file}`);
+      if (!res.ok) throw new Error('文章不存在');
+      md = await res.text();
+    }
     const html = marked.parse(md);
     el.innerHTML = `
       <button class="back-btn" onclick="history.back()">
@@ -284,7 +320,7 @@ async function renderPost(el, file) {
         返回
       </button>
       <article class="post-detail">
-        <h1 class="post-title-large">${post.title || file}</h1>
+        <h1 class="post-title-large">${post.title || file}${post.pinned ? ' <span style="color:var(--pink);font-size:14px;">📌 置顶</span>' : ''}</h1>
         <div class="post-meta">
           <span>📅 ${post.date || ''}</span>
           <span>📂 ${post.category || ''}</span>
@@ -384,6 +420,17 @@ async function fetchGitHubStars() {
       if (el) el.textContent = `⭐ ${repo.stargazers_count}`;
     });
   } catch (e) {}
+}
+
+// ---------- 管理面板占位 ----------
+function renderAdminPlaceholder(el) {
+  el.innerHTML = `
+    <div class="empty-state">
+      <div class="empty-icon">⚙️</div>
+      <h3>管理中心</h3>
+      <p>管理面板已从右侧滑出，关闭后可继续浏览博客</p>
+    </div>
+  `;
 }
 
 // ---------- 启动 ----------

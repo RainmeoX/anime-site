@@ -26,6 +26,7 @@
       <a href="#/projects" data-route="/projects">项目</a>
       <a href="#/tags" data-route="/tags">标签</a>
       <a href="#/about" data-route="/about">关于</a>
+      <a href="#/admin" data-route="/admin" class="admin-link">管理</a>
     </div>
     <div class="nav-actions">
       <button class="icon-btn" id="searchBtn" title="搜索" aria-label="搜索">
@@ -123,6 +124,27 @@
   </div>
 </div>
 
+<!-- 管理面板（全屏抽屉式） -->
+<div class="admin-overlay" id="adminOverlay"></div>
+<aside class="admin-panel" id="adminPanel">
+  <div class="admin-header">
+    <h2>⚙️ 管理中心</h2>
+    <button class="admin-close" id="adminClose" title="关闭">✕</button>
+  </div>
+  <div class="admin-tabs">
+    <button class="admin-tab active" data-tab="posts">📝 文章管理</button>
+    <button class="admin-tab" data-tab="editor">✏️ 写文章</button>
+    <button class="admin-tab" data-tab="profile">👤 个人资料</button>
+    <button class="admin-tab" data-tab="appearance">🎨 外观设置</button>
+    <button class="admin-tab" data-tab="widgets">🧩 侧边栏</button>
+    <button class="admin-tab" data-tab="links">🔗 友情链接</button>
+    <button class="admin-tab" data-tab="data">💾 数据管理</button>
+  </div>
+  <div class="admin-body" id="adminBody">
+    <!-- 由 JS 渲染 -->
+  </div>
+</aside>
+
 <!-- 底部 -->
 <footer class="footer">
   <div class="footer-container">
@@ -150,5 +172,6 @@
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
 <script src="assets/app.js"></script>
+<script src="assets/admin.js"></script>
 </body>
 </html>
