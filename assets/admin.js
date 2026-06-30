@@ -156,6 +156,11 @@ const Admin = (function () {
       if (!silent) UI.toast('保存成功', 'success');
       if (['posts', 'profile', 'widgets', 'links', 'appearance'].includes(key)) {
         window.dispatchEvent(new Event('blog:refresh'));
+        // 跨标签页通信：通知主站 index.html 刷新
+        try {
+          const bc = new BroadcastChannel('rainmeo_blog');
+          bc.postMessage({ type: 'config_changed', key });
+        } catch(e) {}
       }
     },
 
@@ -631,15 +636,27 @@ const Admin = (function () {
     },
 
     // ===== 仪表盘 =====
-    renderDashboard(container) {
+    async renderDashboard(container) {
       const posts = Store.posts.list();
       const customCount = posts.length;
       const publishedCount = posts.filter(p => p.status !== 'draft').length;
       const draftCount = posts.filter(p => p.status === 'draft').length;
 
-      // 标签统计
+      // 获取内置文章数据
+      let builtinCount = 0;
+      let builtinPosts = [];
+      try {
+        const res = await fetch('posts/posts.json');
+        builtinPosts = await res.json();
+        builtinCount = builtinPosts.length;
+      } catch(e) {}
+
+      // 合并内置文章标签统计
       const tagSet = new Set();
       posts.forEach(p => (p.tags || []).forEach(t => tagSet.add(t)));
+      builtinPosts.forEach(p => (p.tags || []).forEach(t => tagSet.add(t)));
+
+      const totalPosts = customCount + builtinCount;
 
       // 数据大小
       const totalSize = JSON.stringify(Store.exportAll()).length;
@@ -648,28 +665,28 @@ const Admin = (function () {
         <div class="dashboard-grid">
           <div class="dashboard-card">
             <div class="dash-stat-icon">📝</div>
-            <div class="dash-stat-value">${customCount}</div>
-            <div class="dash-stat-label">自定义文章</div>
+            <div class="dash-stat-value">${totalPosts}</div>
+            <div class="dash-stat-label">总文章数</div>
           </div>
           <div class="dashboard-card">
             <div class="dash-stat-icon">📤</div>
             <div class="dash-stat-value">${publishedCount}</div>
-            <div class="dash-stat-label">已发布</div>
+            <div class="dash-stat-label">自定义已发布</div>
           </div>
           <div class="dashboard-card">
             <div class="dash-stat-icon">🏷</div>
             <div class="dash-stat-value">${tagSet.size}</div>
-            <div class="dash-stat-label">标签数</div>
+            <div class="dash-stat-label">标签数（含内置）</div>
           </div>
           <div class="dashboard-card">
             <div class="dash-stat-icon">💾</div>
             <div class="dash-stat-value">${(totalSize / 1024).toFixed(1)} KB</div>
-            <div class="dash-stat-label">数据大小</div>
+            <div class="dash-stat-label">自定义数据大小</div>
           </div>
         </div>
 
         <div class="dashboard-section">
-          <h3 class="section-header">📋 最近文章</h3>
+          <h3 class="section-header">📋 最近文章（自定义）</h3>
           ${customCount === 0 ? `
             <div class="admin-empty">
               <div class="empty-icon">📝</div>

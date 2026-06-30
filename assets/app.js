@@ -59,6 +59,19 @@ async function init() {
     renderSidebar();
     router();
   });
+
+  // 跨标签页通信：接收后台管理面板的配置变更通知
+  try {
+    const bc = new BroadcastChannel('rainmeo_blog');
+    bc.onmessage = async (e) => {
+      if (e.data.type === 'config_changed') {
+        PROFILE = getProfile();
+        await loadPosts();
+        renderSidebar();
+        router();
+      }
+    };
+  } catch(e) {}
 }
 
 // ---------- 樱花飘落 ----------
@@ -150,6 +163,17 @@ function renderSidebar() {
         <span class="recent-date">${p.date}</span>
       </li>
     `).join('');
+
+  // 动态渲染友链（从后台管理读取）
+  const links = JSON.parse(localStorage.getItem('rainmeo_links') || 'null');
+  if (links && links.length > 0) {
+    const linksList = document.querySelector('.links-list');
+    if (linksList) {
+      linksList.innerHTML = links.map(l =>
+        `<li><a href="${l.url}" target="_blank" rel="noopener"><span>${l.name}</span></a></li>`
+      ).join('');
+    }
+  }
 }
 
 // ---------- 路由 ----------
