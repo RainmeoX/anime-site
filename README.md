@@ -2,7 +2,7 @@
 
 > 个人博客 SPA - 大模型微调 · 推理部署 · 嵌入式 AI · 全栈开发
 
-> 参考 cnkirito.moe 卡片式布局 + canirun.ai 极简风格，GitHub 风格深色主题
+> 参考 cnkirito.moe 卡片式布局 + GitHub 风格配色，樱花主题 + 左右两栏布局
 
 ## 功能
 
@@ -14,6 +14,11 @@
 - **搜索** - 标题/摘要/标签全文搜索（Ctrl+K 快捷键）
 - **主题切换** - 深色/浅色（GitHub 风格配色）
 - **响应式** - 桌面/平板/手机三档适配，移动端汉堡菜单
+- **管理中心** - 7 个 Tab（仪表盘、文章管理、草稿箱、媒体库、评论审核、访问统计、系统设置）
+- **侧边栏模块开关** - 可独立开关侧边栏各模块的显示
+- **文章 TOC 目录** - 自动生成文章内标题导航目录
+- **上一篇/下一篇导航** - 文章页面底部的前后篇快捷导航
+- **RSS Feed** - Atom 1.0 格式，支持 RSS 阅读器订阅
 
 ## 结构
 
@@ -22,10 +27,14 @@ anime-site/
 ├── index.html              # SPA 入口
 ├── assets/
 │   ├── style.css           # 样式（GitHub 风格 + 主题变量）
-│   └── app.js              # 路由 + 博客逻辑
+│   ├── app.js              # 路由 + 博客逻辑
+│   ├── admin.js            # 管理中心逻辑
+│   └── images/
+│       └── avatar.jpg      # 头像图片
 ├── posts/                  # 博客文章
 │   ├── posts.json          # 文章索引
 │   └── *.md                # Markdown 文章
+├── feed.xml                # Atom RSS Feed
 ├── CNAME                   # 自定义域名
 └── README.md
 ```
@@ -58,7 +67,8 @@ npx serve
      "category": "AI 微调",
      "tags": ["AI", "LoRA"],
      "file": "我的文章.md",
-     "excerpt": "文章摘要，显示在列表里..."
+     "excerpt": "文章摘要，显示在列表里...",
+     "source": "https://blog.csdn.net/..."  // 可选，文章来源链接
    }
    ```
 3. 推送到 GitHub，网站自动更新
@@ -93,6 +103,7 @@ const PROJECTS = [
 - Hash 路由（SPA）
 - localStorage 主题持久化
 - GitHub API 动态拉取 stars
+- Atom 1.0 RSS Feed（feed.xml），支持 RSS 阅读器订阅
 
 ## License
 

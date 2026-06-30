@@ -551,8 +551,14 @@ function applyAppearance(a) {
     CURRENT_THEME = a.theme;
     localStorage.setItem('theme', a.theme);
   }
-  // 强调色
+  // 强调色 — 同时设置主色和 RGB 分量，让所有使用 pink 的地方跟随变化
   document.documentElement.style.setProperty('--pink', a.accentColor);
+  // 将 hex 颜色转为 RGB 分量，供 rgba(var(--pink-rgb), alpha) 使用
+  const hex = a.accentColor.replace('#', '');
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+  document.documentElement.style.setProperty('--pink-rgb', `${r}, ${g}, ${b}`);
   // 字号
   document.body.style.fontSize = a.fontSize + 'px';
   // 圆角

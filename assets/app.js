@@ -109,6 +109,23 @@ async function loadPosts() {
 
 // ---------- 渲染侧边栏 ----------
 function renderSidebar() {
+  // 读取侧边栏模块开关配置
+  let widgets = {};
+  try {
+    widgets = JSON.parse(localStorage.getItem('rainmeo_widgets') || '{}');
+  } catch (e) {}
+
+  // 根据配置控制各模块显示/隐藏
+  const toggleWidget = (selector, key) => {
+    const el = document.querySelector(selector);
+    if (el) el.style.display = widgets[key] === false ? 'none' : '';
+  };
+  toggleWidget('.profile-widget', 'profile');
+  toggleWidget('.profile-stats', 'stats');
+  toggleWidget('.tag-cloud-widget', 'tags');
+  toggleWidget('.recent-posts-widget', 'recent');
+  toggleWidget('.links-widget', 'links');
+
   // 统计
   document.getElementById('statPosts').textContent = POSTS.length;
   document.getElementById('statProjects').textContent = PROJECTS.length;
@@ -326,15 +343,115 @@ async function renderPost(el, file) {
           <span>📂 ${post.category || ''}</span>
           <span>🏷 ${(post.tags || []).join(', ')}</span>
         </div>
+        <div id="toc-placeholder"></div>
         <div class="post-body">${html}</div>
+        ${buildPostNav(post)}
       </article>
     `;
+
+    // 生成目录（TOC）
+    buildTOC(el);
+
     // 代码高亮
     el.querySelectorAll('pre code').forEach(b => {
       try { hljs.highlightElement(b); } catch (e) {}
     });
   } catch (e) {
     el.innerHTML = '<div class="empty-state"><div class="empty-icon">😢</div>文章加载失败</div>';
+  }
+}
+
+// ---------- 上一篇/下一篇文章导航 ----------
+function buildPostNav(currentPost) {
+  // 在 POSTS 数组中找到当前文章的位置
+  const idx = POSTS.findIndex(p => p.file === currentPost.file);
+  if (idx === -1) return '';
+
+  // POSTS 按日期倒序排列，idx-1 是下一篇（更新的），idx+1 是上一篇（更旧的）
+  const prevPost = idx < POSTS.length - 1 ? POSTS[idx + 1] : null; // 上一篇（更旧的文章）
+  const nextPost = idx > 0 ? POSTS[idx - 1] : null; // 下一篇（更新的文章）
+
+  return `
+    <nav class="post-nav">
+      <div class="post-nav-item post-nav-prev">
+        ${prevPost
+          ? `<a href="#/post/${encodeURIComponent(prevPost.file)}" class="post-nav-link">
+              <span class="post-nav-label">← 上一篇</span>
+              <span class="post-nav-title">${prevPost.title}</span>
+            </a>`
+          : `<span class="post-nav-link post-nav-disabled">
+              <span class="post-nav-label">← 上一篇</span>
+              <span class="post-nav-title">已是第一篇</span>
+            </span>`
+        }
+      </div>
+      <div class="post-nav-item post-nav-next">
+        ${nextPost
+          ? `<a href="#/post/${encodeURIComponent(nextPost.file)}" class="post-nav-link">
+              <span class="post-nav-label">下一篇 →</span>
+              <span class="post-nav-title">${nextPost.title}</span>
+            </a>`
+          : `<span class="post-nav-link post-nav-disabled">
+              <span class="post-nav-label">下一篇 →</span>
+              <span class="post-nav-title">已是最后一篇</span>
+            </span>`
+        }
+      </div>
+    </nav>
+  `;
+}
+
+// ---------- 文章目录（TOC）生成 ----------
+function buildTOC(el) {
+  const postBody = el.querySelector('.post-body');
+  if (!postBody) return;
+
+  // 提取所有 h2 和 h3 标题
+  const headings = postBody.querySelectorAll('h2, h3');
+  if (headings.length === 0) return;
+
+  const tocItems = [];
+
+  headings.forEach((h, i) => {
+    // 自动生成 id（锚点跳转用）
+    const id = 'heading-' + i + '-' + (h.textContent || '').replace(/[^a-zA-Z0-9\u4e00-\u9fff]+/g, '-').replace(/^-|-$/g, '');
+    h.id = id;
+
+    tocItems.push({
+      level: h.tagName.toLowerCase(),
+      text: h.textContent,
+      id: id
+    });
+  });
+
+  // 构建 TOC HTML
+  const tocHTML = `
+    <details class="toc-container" open>
+      <summary class="toc-title">目录</summary>
+      <nav class="toc-list">
+        ${tocItems.map(item => `
+          <a href="#${item.id}" class="toc-item toc-${item.level}" data-toc-target="${item.id}">
+            ${item.text}
+          </a>
+        `).join('')}
+      </nav>
+    </details>
+  `;
+
+  const placeholder = el.querySelector('#toc-placeholder');
+  if (placeholder) {
+    placeholder.innerHTML = tocHTML;
+
+    // 点击 TOC 项平滑滚动到对应标题
+    placeholder.querySelectorAll('.toc-item').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.getElementById(this.getAttribute('data-toc-target'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
   }
 }
 

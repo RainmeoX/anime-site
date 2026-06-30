@@ -33,7 +33,7 @@
     "tags": ["AI", "LoRA", "Gemma", "ROCm", "情绪分类"],
     "file": "gemma4-emotion-lora.md",
     "excerpt": "在 AMD Radeon Cloud 的 ROCm 单卡环境上，用 LoRA 对 Gemma 4 做情绪分类微调。单卡 17 分钟跑完 1 轮，准确率从 0.625 提升到 0.915，Macro F1 显著提升。",
-    "source": "https://blog.csdn_net/m0_67166125/article/details/162231675"
+    "source": "https://blog.csdn.net/m0_67166125/article/details/162231675"
   },
   {
     "title": "零成本配置 AMD ROCm 云环境并跑通 Gemma4-E4B",
