@@ -11,7 +11,7 @@ const DEFAULT_PROFILE = {
   github: 'https://github.com/RainmeoX',
   csdn: 'https://blog.csdn.net/m0_67166125',
   blog: 'https://www.rainmeo.xyz',
-  elecfans: 'https://bbs.elecfans.com/jishu_2518692_1_1.html',
+  elecfans: 'https://bbs.elecfans.com/user/6963000/',
   location: '中国 · 深圳',
   skills: ['Python', 'PyTorch', 'LoRA 微调', 'vLLM', 'ROCm', 'Transformers', 'ChromaDB', 'K230', 'MicroPython', 'JavaScript', 'HTML/CSS', 'Selenium', 'Flask'],
   interests: ['大模型微调', '推理部署', 'RAG 应用', '嵌入式 AI', '网络安全', '自动化工具']
@@ -168,7 +168,6 @@ function router() {
   else if (hash === '/projects') renderProjects(main);
   else if (hash === '/tags') renderTags(main);
   else if (hash === '/about') renderAbout(main);
-  else if (hash === '/admin') { renderAdminPlaceholder(main); openAdmin(); }
   else if (hash.startsWith('/post/')) renderPost(main, decodeURIComponent(hash.slice(6)));
   else renderHome(main);
 
@@ -308,7 +307,8 @@ function renderAbout(el) {
       <p>
         GitHub: <a href="${PROFILE.github}" target="_blank" style="color:var(--pink);">${PROFILE.github}</a><br>
         CSDN: <a href="${PROFILE.csdn}" target="_blank" style="color:var(--pink);">${PROFILE.csdn}</a><br>
-        博客: <a href="${PROFILE.blog}" target="_blank" style="color:var(--pink);">${PROFILE.blog}</a>
+        博客: <a href="${PROFILE.blog}" target="_blank" style="color:var(--pink);">${PROFILE.blog}</a><br>
+        电子发烧友: <a href="${PROFILE.elecfans}" target="_blank" style="color:var(--pink);">${PROFILE.elecfans}</a>
       </p>
     </div>
   `;
@@ -537,17 +537,6 @@ async function fetchGitHubStars() {
       if (el) el.textContent = `⭐ ${repo.stargazers_count}`;
     });
   } catch (e) {}
-}
-
-// ---------- 管理面板占位 ----------
-function renderAdminPlaceholder(el) {
-  el.innerHTML = `
-    <div class="empty-state">
-      <div class="empty-icon">⚙️</div>
-      <h3>管理中心</h3>
-      <p>管理面板已从右侧滑出，关闭后可继续浏览博客</p>
-    </div>
-  `;
 }
 
 // ---------- 启动 ----------

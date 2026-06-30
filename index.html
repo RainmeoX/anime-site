@@ -26,7 +26,7 @@
       <a href="#/projects" data-route="/projects">项目</a>
       <a href="#/tags" data-route="/tags">标签</a>
       <a href="#/about" data-route="/about">关于</a>
-      <a href="#/admin" data-route="/admin" class="admin-link">管理</a>
+      <a href="admin.html" class="admin-link">管理</a>
     </div>
     <div class="nav-actions">
       <button class="icon-btn" id="searchBtn" title="搜索" aria-label="搜索">
@@ -84,6 +84,9 @@
           <a href="https://www.rainmeo.xyz" target="_blank" rel="noopener" title="博客主站">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
           </a>
+          <a href="https://bbs.elecfans.com/user/6963000/" target="_blank" rel="noopener" title="电子发烧友">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          </a>
         </div>
       </div>
 
@@ -106,12 +109,30 @@
           <li><a href="https://github.com/RainmeoX" target="_blank" rel="noopener"><span>GitHub</span><span class="link-tag">github.com</span></a></li>
           <li><a href="https://blog.csdn.net/m0_67166125" target="_blank" rel="noopener"><span>CSDN 博客</span><span class="link-tag">csdn.net</span></a></li>
           <li><a href="https://www.rainmeo.xyz" target="_blank" rel="noopener"><span>博客主站</span><span class="link-tag">rainmeo.xyz</span></a></li>
+          <li><a href="https://bbs.elecfans.com/user/6963000/" target="_blank" rel="noopener"><span>电子发烧友</span><span class="link-tag">elecfans.com</span></a></li>
         </ul>
       </div>
     </aside>
 
   </div>
 </main>
+
+<!-- 登录弹窗 -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-modal">
+    <h2 class="login-title">🌸 管理中心登录</h2>
+    <div class="login-field">
+      <label for="loginUsername">用户名</label>
+      <input type="text" id="loginUsername" placeholder="请输入用户名" autocomplete="username">
+    </div>
+    <div class="login-field">
+      <label for="loginPassword">密码</label>
+      <input type="password" id="loginPassword" placeholder="请输入密码" autocomplete="current-password">
+    </div>
+    <div class="login-error" id="loginError"></div>
+    <button class="login-btn" id="loginSubmit">🔐 登 录</button>
+  </div>
+</div>
 
 <!-- 搜索弹窗 -->
 <div class="search-modal" id="searchModal">
@@ -124,28 +145,17 @@
   </div>
 </div>
 
-<!-- 管理面板（全屏抽屉式） -->
-<div class="admin-overlay" id="adminOverlay"></div>
-<aside class="admin-panel" id="adminPanel">
-  <div class="admin-header">
-    <h2>⚙️ 管理中心</h2>
-    <button class="admin-close" id="adminClose" title="关闭">✕</button>
+<!-- 自定义确认弹窗（Admin.UI.confirm 使用） -->
+<div class="admin-confirm-overlay" id="adminConfirmModal">
+  <div class="admin-confirm-modal">
+    <div class="admin-confirm-msg" id="adminConfirmMsg"></div>
+    <div class="admin-confirm-actions">
+      <button class="admin-confirm-btn admin-confirm-cancel" id="adminConfirmCancel">取消</button>
+      <button class="admin-confirm-btn admin-confirm-ok" id="adminConfirmOk">确定</button>
+    </div>
   </div>
-  <div class="admin-tabs">
-    <button class="admin-tab active" data-tab="posts">📝 文章管理</button>
-    <button class="admin-tab" data-tab="editor">✏️ 写文章</button>
-    <button class="admin-tab" data-tab="profile">👤 个人资料</button>
-    <button class="admin-tab" data-tab="appearance">🎨 外观设置</button>
-    <button class="admin-tab" data-tab="widgets">🧩 侧边栏</button>
-    <button class="admin-tab" data-tab="links">🔗 友情链接</button>
-    <button class="admin-tab" data-tab="data">💾 数据管理</button>
-  </div>
-  <div class="admin-body" id="adminBody">
-    <!-- 由 JS 渲染 -->
-  </div>
-</aside>
+</div>
 
-<!-- 底部 -->
 <footer class="footer">
   <div class="footer-container">
     <div class="footer-left">

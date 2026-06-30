@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理后台 · RainmeoX</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="admin/admin.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>">
+</head>
+<body>
+  <!-- 登录弹窗 -->
+  <div class="login-overlay active" id="loginOverlay">
+    <div class="login-modal">
+      <h2 class="login-title">🌸 管理中心登录</h2>
+      <div class="login-field">
+        <label for="loginUsername">用户名</label>
+        <input type="text" id="loginUsername" placeholder="请输入用户名" autocomplete="username">
+      </div>
+      <div class="login-field">
+        <label for="loginPassword">密码</label>
+        <input type="password" id="loginPassword" placeholder="请输入密码" autocomplete="current-password">
+      </div>
+      <div class="login-error" id="loginError"></div>
+      <button class="login-btn" id="loginSubmit">🔐 登 录</button>
+    </div>
+  </div>
+
+  <!-- 后台主布局（登录后显示） -->
+  <div class="admin-layout" id="adminLayout" style="display:none;">
+    <!-- 左侧菜单 -->
+    <aside class="admin-sidebar">
+      <div class="admin-brand">
+        <span>🌸</span>
+        <span>管理后台</span>
+      </div>
+      <nav class="admin-menu" id="adminMenu">
+        <!-- JS 动态渲染 -->
+      </nav>
+      <a href="./" class="admin-back">← 返回主站</a>
+    </aside>
+
+    <!-- 右侧内容 -->
+    <div class="admin-main">
+      <header class="admin-topbar">
+        <h2 class="admin-page-title" id="adminPageTitle">📊 仪表盘</h2>
+        <div class="admin-topbar-actions">
+          <button class="admin-logout-btn" id="adminLogoutBtn">🚪 退出登录</button>
+        </div>
+      </header>
+      <div class="admin-content" id="adminContent">
+        <!-- JS 动态渲染 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 自定义确认弹窗 -->
+  <div class="admin-confirm-overlay" id="adminConfirmOverlay">
+    <div class="admin-confirm-modal">
+      <p class="admin-confirm-msg" id="adminConfirmMsg"></p>
+      <div class="admin-confirm-actions">
+        <button class="btn btn-secondary" id="adminConfirmCancel">取消</button>
+        <button class="btn btn-primary" id="adminConfirmOk">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- CDN 依赖 -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
+  <!-- 后台逻辑 -->
+  <script src="assets/admin.js"></script>
+</body>
+</html>

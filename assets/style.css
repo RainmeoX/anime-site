@@ -618,8 +618,17 @@ body {
 }
 
 /* ---------- 文章详情 ---------- */
+/* 文章详情卡片容器 - CSDN 风格增强 */
+.post-detail {
+  background: var(--card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  padding: 32px 36px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
 .post-detail .post-title-large {
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 700;
   color: var(--text);
   margin-bottom: 12px;
@@ -636,69 +645,172 @@ body {
   flex-wrap: wrap;
 }
 .post-detail .post-body {
-  font-size: 15px;
-  line-height: 1.8;
+  font-size: 16px;
+  line-height: 1.9;
   color: var(--text);
 }
-.post-detail .post-body h1,
-.post-detail .post-body h2,
-.post-detail .post-body h3 {
-  margin: 24px 0 12px;
+/* 标题层级 - CSDN 风格 */
+.post-detail .post-body h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 32px 0 16px;
   color: var(--text);
+  line-height: 1.3;
 }
 .post-detail .post-body h2 {
-  font-size: 20px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border-light);
+  font-size: 22px;
+  font-weight: 700;
+  margin: 28px 0 14px;
+  color: var(--text);
+  padding-left: 12px;
+  border-left: 4px solid var(--pink);
+  padding-bottom: 0;
+  border-bottom: none;
+  line-height: 1.4;
 }
-.post-detail .post-body p { margin-bottom: 16px; }
-.post-detail .post-body a { color: var(--pink); }
+.post-detail .post-body h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 22px 0 10px;
+  color: var(--text);
+  line-height: 1.5;
+}
+.post-detail .post-body h4 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 18px 0 8px;
+  color: var(--text);
+}
+/* 段落 */
+.post-detail .post-body p {
+  margin-bottom: 20px;
+  line-height: 1.9;
+}
+/* 链接 */
+.post-detail .post-body a {
+  color: var(--pink);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(var(--pink-rgb, 255, 107, 157), 0.3);
+  transition: border-color 0.2s;
+}
+.post-detail .post-body a:hover {
+  border-bottom-color: var(--pink);
+}
+/* 行内代码 */
 .post-detail .post-body code {
-  background: var(--card-hover);
-  padding: 2px 6px;
+  background: rgba(var(--pink-rgb, 255, 107, 157), 0.08);
+  padding: 2px 8px;
   border-radius: 4px;
-  font-size: 13px;
-  font-family: 'Source Code Pro', 'Consolas', monospace;
+  font-size: 0.88em;
+  font-family: 'Source Code Pro', 'Consolas', 'Menlo', monospace;
+  color: var(--pink-dark);
+  border: 1px solid rgba(var(--pink-rgb, 255, 107, 157), 0.12);
 }
+/* 代码块 */
 .post-detail .post-body pre {
-  background: #1a1530 !important;
-  padding: 16px;
+  background: #1e1b2e;
+  padding: 20px;
   border-radius: var(--radius-sm);
   overflow-x: auto;
-  margin: 16px 0;
+  margin: 20px 0;
   border: 1px solid var(--border-light);
+  position: relative;
+  font-size: 14px;
+  line-height: 1.6;
+}
+[data-theme="light"] .post-detail .post-body pre {
+  background: #f6f8fa;
+  border-color: #d0d7de;
 }
 .post-detail .post-body pre code {
   background: transparent;
   padding: 0;
+  border: none;
+  font-size: inherit;
+  color: inherit;
 }
+/* 引用块 */
 .post-detail .post-body blockquote {
-  border-left: 4px solid var(--pink);
-  padding: 8px 16px;
-  margin: 16px 0;
-  background: var(--card-hover);
+  border-left: 5px solid var(--pink);
+  padding: 12px 20px;
+  margin: 20px 0;
+  background: rgba(var(--pink-rgb, 255, 107, 157), 0.04);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   color: var(--text-secondary);
+  font-style: italic;
 }
-.post-detail .post-body img {
-  max-width: 100%;
-  border-radius: var(--radius-sm);
+.post-detail .post-body blockquote p {
+  margin-bottom: 8px;
+}
+.post-detail .post-body blockquote p:last-child {
+  margin-bottom: 0;
+}
+/* 无序列表和有序列表 */
+.post-detail .post-body ul,
+.post-detail .post-body ol {
   margin: 16px 0;
+  padding-left: 24px;
 }
+.post-detail .post-body li {
+  margin-bottom: 8px;
+  line-height: 1.8;
+}
+.post-detail .post-body li:last-child {
+  margin-bottom: 0;
+}
+.post-detail .post-body ul ul,
+.post-detail .post-body ol ol,
+.post-detail .post-body ul ol,
+.post-detail .post-body ol ul {
+  margin: 8px 0;
+}
+/* 图片 */
+.post-detail .post-body img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-sm);
+  margin: 20px auto;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+/* 表格 - CSDN 斑马纹风格 */
 .post-detail .post-body table {
   width: 100%;
   border-collapse: collapse;
-  margin: 16px 0;
+  margin: 20px 0;
+  font-size: 14px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.post-detail .post-body thead th {
+  background: rgba(var(--pink-rgb, 255, 107, 157), 0.08);
+  font-weight: 700;
+  font-size: 14px;
+  border-bottom: 2px solid var(--border);
 }
 .post-detail .post-body th,
 .post-detail .post-body td {
-  padding: 8px 12px;
+  padding: 10px 14px;
   border: 1px solid var(--border-light);
   text-align: left;
 }
-.post-detail .post-body th {
+.post-detail .post-body tbody tr:nth-child(even) {
   background: var(--card-hover);
-  font-weight: 600;
+}
+.post-detail .post-body tbody tr:hover {
+  background: rgba(var(--pink-rgb, 255, 107, 157), 0.04);
+}
+/* 分割线 */
+.post-detail .post-body hr {
+  border: none;
+  height: 1px;
+  background: var(--border-light);
+  margin: 32px 0;
+}
+/* 强调/加粗 */
+.post-detail .post-body strong {
+  font-weight: 700;
+  color: var(--text);
 }
 
 /* ---------- 文章导航（上一篇/下一篇） ---------- */
@@ -950,6 +1062,194 @@ body {
   color: var(--text-secondary);
 }
 
+/* ---------- 登录弹窗 ---------- */
+.login-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 300;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.login-overlay.active { display: flex; }
+
+.login-modal {
+  background: var(--card-solid);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 36px 32px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.25);
+  animation: loginFadeIn 0.3s ease;
+}
+@keyframes loginFadeIn {
+  from { opacity: 0; transform: translateY(-20px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.login-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  text-align: center;
+  margin-bottom: 28px;
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.login-field {
+  margin-bottom: 18px;
+}
+.login-field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.login-field input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card-solid);
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+.login-field input:focus {
+  border-color: var(--pink);
+  box-shadow: 0 0 0 3px rgba(var(--pink-rgb, 255, 107, 157), 0.1);
+}
+.login-field input.input-error {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.login-error {
+  font-size: 13px;
+  color: #ef4444;
+  text-align: center;
+  min-height: 20px;
+  margin-bottom: 8px;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 8px;
+}
+.login-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(var(--pink-rgb, 255, 107, 157), 0.35);
+}
+.login-btn:active {
+  transform: translateY(0);
+}
+
+/* 退出登录按钮 */
+.admin-logout-btn {
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg2);
+  color: var(--text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.admin-logout-btn:hover {
+  background: #ef4444;
+  color: #fff;
+  border-color: #ef4444;
+}
+
+/* ---------- 自定义确认弹窗 ---------- */
+.admin-confirm-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 400;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.admin-confirm-overlay.active { display: flex; }
+
+.admin-confirm-modal {
+  background: var(--card-solid);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px 28px;
+  width: 90%;
+  max-width: 420px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.25);
+  animation: loginFadeIn 0.25s ease;
+}
+
+.admin-confirm-msg {
+  font-size: 15px;
+  color: var(--text);
+  line-height: 1.6;
+  margin-bottom: 28px;
+  white-space: pre-line;
+}
+
+.admin-confirm-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.admin-confirm-btn {
+  padding: 9px 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.admin-confirm-cancel {
+  background: var(--card-hover);
+  color: var(--text-secondary);
+}
+.admin-confirm-cancel:hover {
+  background: var(--border-light);
+}
+
+.admin-confirm-ok {
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  color: #fff;
+  border-color: transparent;
+}
+.admin-confirm-ok:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(var(--pink-rgb, 255, 107, 157), 0.35);
+}
+
 /* ---------- 搜索弹窗 ---------- */
 .search-modal {
   position: fixed;
@@ -1138,7 +1438,25 @@ body {
 
   .about-card { padding: 20px; }
 
+  /* 文章详情移动端 */
+  .post-detail {
+    padding: 20px 16px;
+  }
   .post-detail .post-title-large { font-size: 22px; }
+  .post-detail .post-body {
+    font-size: 15px;
+    line-height: 1.8;
+  }
+  .post-detail .post-body h1 { font-size: 24px; margin: 24px 0 12px; }
+  .post-detail .post-body h2 { font-size: 19px; margin: 22px 0 10px; padding-left: 10px; }
+  .post-detail .post-body h3 { font-size: 16px; }
+  .post-detail .post-body p { margin-bottom: 16px; }
+  .post-detail .post-body pre { padding: 14px; font-size: 13px; }
+  .post-detail .post-body blockquote { padding: 10px 14px; }
+  .post-detail .post-body img { margin: 16px auto; }
+  .post-detail .post-body table { font-size: 12px; }
+  .post-detail .post-body th,
+  .post-detail .post-body td { padding: 6px 8px; }
 
   .footer-container { flex-direction: column; text-align: center; }
 }
@@ -1159,100 +1477,6 @@ body {
 .nav-links a.admin-link:hover {
   opacity: 0.9;
   transform: translateY(-1px);
-}
-
-/* 遮罩 */
-.admin-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
-  backdrop-filter: blur(4px);
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s;
-  z-index: 200;
-}
-.admin-overlay.active { opacity: 1; visibility: visible; }
-
-/* 面板 */
-.admin-panel {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: min(900px, 92vw);
-  height: 100vh;
-  background: var(--bg);
-  box-shadow: -8px 0 32px rgba(0,0,0,0.2);
-  transform: translateX(100%);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 201;
-  display: flex;
-  flex-direction: column;
-}
-.admin-panel.active { transform: translateX(0); }
-
-.admin-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 18px 24px;
-  border-bottom: 1px solid var(--border);
-  background: var(--card-solid);
-}
-.admin-header h2 {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text);
-}
-.admin-close {
-  width: 32px;
-  height: 32px;
-  border: none;
-  background: var(--bg2);
-  color: var(--text);
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-}
-.admin-close:hover { background: var(--pink); color: #fff; }
-
-/* 标签栏 */
-.admin-tabs {
-  display: flex;
-  gap: 4px;
-  padding: 12px 24px;
-  border-bottom: 1px solid var(--border);
-  background: var(--card-solid);
-  overflow-x: auto;
-  flex-wrap: nowrap;
-}
-.admin-tab {
-  padding: 8px 14px;
-  border: none;
-  background: transparent;
-  color: var(--text-secondary);
-  cursor: pointer;
-  border-radius: 8px;
-  font-size: 13px;
-  white-space: nowrap;
-  transition: all 0.2s;
-}
-.admin-tab:hover { background: var(--bg2); color: var(--text); }
-.admin-tab.active {
-  background: linear-gradient(135deg, var(--pink), var(--purple));
-  color: #fff;
-  font-weight: 600;
-}
-
-/* 面板内容 */
-.admin-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: 24px;
 }
 
 /* 表单组 */
