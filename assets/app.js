@@ -29,8 +29,8 @@ function getProfile() {
 let PROFILE = getProfile();
 
 const PROJECTS = [
-  { name: 'zzz-yixuan-assistant', desc: '基于 Qwen3-4B + LoRA 微调的角色风格化对话系统后端，vLLM 部署 + RAG 检索 + 防 OOC 校验', lang: 'Python', stars: 0 },
-  { name: 'zzz-yixuan-webui', desc: '纯原生 HTML/CSS/JS 打造的对话助手前端，零依赖，支持桌面/平板/手机三档响应式布局', lang: 'CSS', stars: 0 },
+  { name: 'zzz-yixuan-assistant', desc: '基于 Qwen3-4B + LoRA 微调的角色风格化对话系统后端，vLLM 部署 + RAG 检索 + 防 OOC 校验', lang: 'Python', stars: 1 },
+  { name: 'zzz-yixuan-webui', desc: '纯原生 HTML/CSS/JS 打造的对话助手前端，零依赖，支持桌面/平板/手机三档响应式布局', lang: 'CSS', stars: 1 },
   { name: 'arknights-qwen-assistant', desc: '基于 Qwen3-0.6B + LoRA 的垂直知识问答系统，133 个实体 8846 条问答，8 分钟训练完成', lang: 'Python', stars: 0 },
   { name: 'gemma4-emotion-lora-rocm', desc: 'Gemma4-E4B 情绪分类 LoRA 微调，AMD ROCm 单卡 17 分钟训练，准确率 0.625→0.915', lang: 'Python', stars: 0 },
   { name: 'K230-Vision-System', desc: '基于 K230 AI 芯片的多功能嵌入式视觉检测系统，三角形/圆形/矩形检测 + 二维码识别 + UART 通信', lang: 'C++', stars: 0 },
@@ -51,7 +51,7 @@ async function init() {
   startSakura();
   renderSidebar();
   router();
-  fetchGitHubStars();
+  // star 数已写死在 PROJECTS 数组，不再实时调 GitHub API（避免未鉴权限流）
   // 监听管理面板的刷新事件
   window.addEventListener('blog:refresh', async () => {
     PROFILE = getProfile();  // 重新加载个人资料
@@ -548,19 +548,6 @@ function bindEvents() {
   backToTop.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
-}
-
-// ---------- 动态拉取 GitHub stars ----------
-async function fetchGitHubStars() {
-  try {
-    const res = await fetch('https://api.github.com/users/RainmeoX/repos?per_page=100');
-    const repos = await res.json();
-    if (!Array.isArray(repos)) return;
-    repos.forEach(repo => {
-      const el = document.querySelector(`[data-repo="${repo.name}"]`);
-      if (el) el.textContent = `⭐ ${repo.stargazers_count}`;
-    });
-  } catch (e) {}
 }
 
 // ---------- 启动 ----------

@@ -68,10 +68,10 @@
   <!-- Toast -->
   <div class="toast" id="toast"></div>
 
-  <!-- CDN 依赖 -->
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
+  <!-- 本地依赖（避免 CDN 不稳定） -->
+  <link rel="stylesheet" href="assets/vendor/atom-one-dark.min.css">
+  <script src="assets/vendor/marked.min.js"></script>
+  <script src="assets/vendor/highlight.min.js"></script>
   <!-- 后台逻辑 -->
   <script src="assets/admin.js"></script>
 </body>
