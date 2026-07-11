@@ -2,6 +2,11 @@
 
 > 原文链接：[https://blog.csdn.net/m0_67166125/article/details/162231675](https://blog.csdn.net/m0_67166125/article/details/162231675)
 
+
+
+
+
+
 ## AMD 云环境模型微调：把 Gemma 4 调成"情绪分析"专用模型
 
 > **话题标签**：#Datawhale #AMDev

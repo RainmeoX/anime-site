@@ -2,7 +2,10 @@
 
 > 原文链接：[https://blog.csdn.net/m0_67166125/article/details/162209300](https://blog.csdn.net/m0_67166125/article/details/162209300)
 
-> 标签：#AMD #ROCm #Gemma4 #vLLM #大模型部署 #云环境 #Datawhale #AI开发 #深度学习 #GPU计算
+
+
+
+
 
 今天在[Datawhale](https://ailc.datawhale.cn/hall/group/100000144) × [AMD 开发者云](https://developer.amd.com.cn/) 的Hello-ROCm 学习，成功在 AMD 开发者云上把 Google 的 Gemma4-E4B-it 跑起来并完成简单对话。  
  这篇笔记我把完整流程、坑点和心得整理出来，方便回看也供同样在学的同学参考。

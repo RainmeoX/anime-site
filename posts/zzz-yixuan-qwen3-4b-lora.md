@@ -2,6 +2,11 @@
 
 > 原文链接：[https://blog.csdn.net/m0_67166125/article/details/162312178](https://blog.csdn.net/m0_67166125/article/details/162312178)
 
+
+
+
+
+
 ## 绝区零「仪玄」角色助手微调实录：AMD ROCm 单卡 + Qwen3-4B LoRA 全流程
 
 ### 前言：为什么要在 AMD 显卡上微调一个游戏角色
