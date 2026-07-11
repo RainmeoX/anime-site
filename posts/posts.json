@@ -1,45 +1,73 @@
 [
   {
-    "title": "Qwen3-0.6B + LoRA 明日方舟干员助手微调实录",
+    "title": "Qwen3-0.6B + LoRA 明日方舟干员助手微调实录：AMD ROCm 单卡全流程",
     "date": "2026-06-25",
     "category": "AI 微调",
-    "tags": ["AI", "LoRA", "明日方舟", "ROCm", "Qwen"],
+    "tags": [
+      "AI",
+      "LoRA",
+      "明日方舟",
+      "ROCm",
+      "Qwen"
+    ],
     "file": "qwen3-arknights-lora.md",
     "excerpt": "在 AMD Radeon Cloud 单卡上用 Qwen3-0.6B 做底座、LoRA 微调，训练能回答干员问题、查询干员资料、扮演干员对话的 AI 助手。133 个六星干员，8846 条问答，8-15 分钟训完。",
     "source": "https://blog.csdn.net/m0_67166125/article/details/162348092"
   },
   {
-    "title": "绝区零「仪玄」角色助手微调实录：Qwen3-4B LoRA",
+    "title": "绝区零「仪玄」角色助手微调实录：AMD ROCm 单卡 + Qwen3-4B LoRA 全流程",
     "date": "2026-06-22",
     "category": "AI 微调",
-    "tags": ["AI", "LoRA", "绝区零", "ROCm", "Qwen"],
+    "tags": [
+      "AI",
+      "LoRA",
+      "绝区零",
+      "ROCm",
+      "Qwen"
+    ],
     "file": "zzz-yixuan-qwen3-4b-lora.md",
     "excerpt": "用 AMD Radeon RX 7900 XTX 单卡，以 Qwen3-4B 为底座、LoRA 做参数高效微调，训练《绝区零》仪玄角色助手，再通过 vLLM 部署推理，配合 ChromaDB 向量检索。",
     "source": "https://blog.csdn.net/m0_67166125/article/details/162312178"
   },
   {
-    "title": "用纯前端打造绝区零风格 AI 角色助手 WebUI",
+    "title": "【实战】用纯前端打造绝区零风格 AI 角色助手 WebUI 并联调 vLLM",
     "date": "2026-06-20",
     "category": "前端实战",
-    "tags": ["前端", "WebUI", "绝区零", "vLLM"],
+    "tags": [
+      "前端",
+      "WebUI",
+      "绝区零",
+      "vLLM"
+    ],
     "file": "zzz-webui-frontend.md",
     "excerpt": "用纯原生 HTML/CSS/JS 零依赖打造绝区零风格 AI 角色助手 WebUI，拆解 ZZZ 视觉语言（黄黑撞色、斜切角、故障艺术），实现流式对话、Markdown 渲染、RAG/校验开关。",
     "source": "https://blog.csdn.net/m0_67166125/article/details/162312263"
   },
   {
-    "title": "Gemma 4 情绪分类微调实录：AMD ROCm + LoRA",
+    "title": "Gemma 4 情绪分类微调实录：AMD ROCm 单卡 + LoRA 全流程",
     "date": "2026-06-18",
     "category": "AI 微调",
-    "tags": ["AI", "LoRA", "Gemma", "ROCm", "情绪分类"],
+    "tags": [
+      "AI",
+      "LoRA",
+      "Gemma",
+      "ROCm",
+      "情绪分类"
+    ],
     "file": "gemma4-emotion-lora.md",
     "excerpt": "在 AMD Radeon Cloud 的 ROCm 单卡环境上，用 LoRA 对 Gemma 4 做情绪分类微调。单卡 17 分钟跑完 1 轮，准确率从 0.625 提升到 0.915，Macro F1 显著提升。",
     "source": "https://blog.csdn.net/m0_67166125/article/details/162231675"
   },
   {
-    "title": "零成本配置 AMD ROCm 云环境并跑通 Gemma4-E4B",
+    "title": "【实战】：零成本配置 AMD ROCm 云环境并跑通 Gemma4-E4B云端大模型",
     "date": "2026-06-15",
     "category": "环境配置",
-    "tags": ["ROCm", "AMD", "Gemma", "云端"],
+    "tags": [
+      "ROCm",
+      "AMD",
+      "Gemma",
+      "云端"
+    ],
     "file": "amd-rocm-cloud-setup.md",
     "excerpt": "在 AMD 开发者云平台上部署 Google Gemma4-E4B-it 大模型的完整流程。通过 ROCm 环境验证 GPU 可用性，使用 ModelScope 下载模型权重（约 15G）。",
     "source": "https://blog.csdn.net/m0_67166125/article/details/162209300"
@@ -48,7 +76,11 @@
     "title": "魅蓝 Note2 折腾记：从刷机失败到部署个人博客",
     "date": "2026-06-27",
     "category": "折腾",
-    "tags": ["折腾", "Android", "博客"],
+    "tags": [
+      "折腾",
+      "Android",
+      "博客"
+    ],
     "file": "note2-blog-journey.md",
     "excerpt": "一台 2015 年的魅蓝 Note2，一台刷废的 MX4 Pro，一段从刷机到部署个人博客的折腾之旅。Termux、KSWeb、内网穿透，老设备的第二春。"
   },
@@ -56,7 +88,11 @@
     "title": "电子发烧友社区帖子合集",
     "date": "2026-06-10",
     "category": "社区分享",
-    "tags": ["电子发烧友", "社区", "分享"],
+    "tags": [
+      "电子发烧友",
+      "社区",
+      "分享"
+    ],
     "file": "elecfans-posts.md",
     "excerpt": "在电子发烧友社区分享的技术帖子合集，涵盖 AI 微调、硬件折腾等内容。点击查看原帖。",
     "source": "https://bbs.elecfans.com/jishu_2518692_1_1.html"
