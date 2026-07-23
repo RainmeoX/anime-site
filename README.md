@@ -1,109 +1,59 @@
-# RainmeoX · 技术博客
+# RainmeoX 个人主页 / 博客
 
-> 个人博客 SPA - 大模型微调 · 推理部署 · 嵌入式 AI · 全栈开发
+纯静态 SPA，用来展示 GitHub 项目 + 写博客文章，部署在 GitHub Pages。
 
-> 参考 cnkirito.moe 卡片式布局 + GitHub 风格配色，樱花主题 + 左右两栏布局
+## 项目背景
+
+我想要一个不依赖框架、零构建、能自己托管博客和项目展示的个人信息页，顺手练一下原生前端。
 
 ## 功能
 
-- **首页** - 英雄区 + 技能标签 + 最新文章 + 精选项目（自动拉取 GitHub stars）
-- **博客** - Markdown 文章列表，卡片式布局，含日期/标题/摘要/标签
-- **项目** - GitHub 项目卡片网格，语言标签 + Star 数
-- **标签** - 按标签聚合文章
-- **关于** - 个人简介 + 技能清单 + 联系方式
-- **搜索** - 标题/摘要/标签全文搜索（Ctrl+K 快捷键）
-- **主题切换** - 深色/浅色（GitHub 风格配色）
-- **响应式** - 桌面/平板/手机三档适配，移动端汉堡菜单
-- **管理中心** - 7 个 Tab（仪表盘、文章管理、草稿箱、媒体库、评论审核、访问统计、系统设置）
-- **侧边栏模块开关** - 可独立开关侧边栏各模块的显示
-- **文章 TOC 目录** - 自动生成文章内标题导航目录
-- **上一篇/下一篇导航** - 文章页面底部的前后篇快捷导航
-- **RSS Feed** - Atom 1.0 格式，支持 RSS 阅读器订阅
+- 首页 / 博客 / 项目 / 标签 / 关于 几个板块
+- Markdown 文章 + 卡片式布局
+- 深色 / 浅色主题切换（GitHub 风格配色）
+- 响应式（桌面 / 平板 / 手机三档，移动端汉堡菜单）
+- RSS（Atom 1.0），可被阅读器订阅
+- GitHub API 动态拉取项目 stars
 
-## 结构
+## 技术栈
 
-```
-anime-site/
-├── index.html              # SPA 入口
-├── assets/
-│   ├── style.css           # 样式（GitHub 风格 + 主题变量）
-│   ├── app.js              # 路由 + 博客逻辑
-│   ├── admin.js            # 管理中心逻辑
-│   └── images/
-│       └── avatar.jpg      # 头像图片
-├── posts/                  # 博客文章
-│   ├── posts.json          # 文章索引
-│   └── *.md                # Markdown 文章
-├── feed.xml                # Atom RSS Feed
-├── CNAME                   # 自定义域名
-└── README.md
-```
+- 纯 HTML / CSS / JS，无框架依赖，零构建工具
+- [marked.js](https://github.com/markedjs/marked) 渲染 Markdown
+- [highlight.js](https://highlightjs.org/) 代码高亮
+- Hash 路由（SPA）+ localStorage 主题持久化
 
 ## 部署
 
-### GitHub Pages（当前部署）
+GitHub Pages（main 分支），自定义域名 www.rainmeo.xyz（CNAME 文件）。
 
-1. 仓库 Settings → Pages → Source: main 分支
-2. 自定义域名：www.rainmeo.xyz（CNAME 文件配置）
-3. 访问 https://www.rainmeo.xyz
-
-### 本地预览
+本地预览：
 
 ```bash
 python -m http.server 8000
 # 或
 npx serve
 ```
-访问 `http://localhost:8000`
 
-## 写新文章
+## 我的工作
 
-1. 在 `posts/` 目录新建 `我的文章.md`，用 Markdown 写内容
-2. 编辑 `posts/posts.json`，添加索引：
-   ```json
-   {
-     "title": "我的文章",
-     "date": "2026-06-27",
-     "category": "AI 微调",
-     "tags": ["AI", "LoRA"],
-     "file": "我的文章.md",
-     "excerpt": "文章摘要，显示在列表里...",
-     "source": "https://blog.csdn.net/..."  // 可选，文章来源链接
-   }
-   ```
-3. 推送到 GitHub，网站自动更新
+- 设计 SPA 路由与博客逻辑（`app.js`）
+- 实现管理中心（文章管理 / 草稿 / 媒体库等）
+- 实现 RSS 与主题切换
 
-## 自定义
+## 项目不足
 
-编辑 `assets/app.js` 顶部的配置：
+- 文章管理靠手动编辑 `posts/posts.json`，不够顺手
+- 无后端，评论需借助外部服务
+- 部分交互在老浏览器上未充分测试
 
-```javascript
-const PROFILE = {
-  name: 'RainmeoX',
-  bio: '大模型微调 · 推理部署 · 嵌入式 AI · 全栈开发',
-  github: 'https://github.com/RainmeoX',
-  csdn: 'https://blog.csdn.net/m0_67166125',
-  blog: 'https://www.rainmeo.xyz',
-  location: '中国 · 深圳',
-  skills: ['Python', 'PyTorch', 'LoRA 微调', 'vLLM', ...],
-  interests: ['大模型微调', '推理部署', 'RAG 应用', ...]
-};
+## 后续计划
 
-const PROJECTS = [
-  { name: '仓库名', desc: '描述', lang: '语言', stars: 0 },
-  // ...
-];
-```
+- 考虑加 CI 自动构建 / 校验文章格式
+- 优化移动端细节
 
-## 技术栈
+## Reflection
 
-- 纯 HTML/CSS/JS，无框架依赖，零构建工具
-- [marked.js](https://github.com/markedjs/marked) - Markdown 渲染
-- [highlight.js](https://highlightjs.org/) - 代码高亮（github-dark 主题）
-- Hash 路由（SPA）
-- localStorage 主题持久化
-- GitHub API 动态拉取 stars
-- Atom 1.0 RSS Feed（feed.xml），支持 RSS 阅读器订阅
+这个项目让我练了"零依赖纯前端"的取舍：能用原生就别急着上框架，维护成本和心智负担都低很多。代价是有些功能要自己写，但写一遍更懂原理。
 
 ## License
 
