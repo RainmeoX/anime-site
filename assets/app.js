@@ -36,7 +36,7 @@ const PROJECTS = [
   { name: 'K230-Vision-System', desc: '基于 K230 AI 芯片的多功能嵌入式视觉检测系统，三角形/圆形/矩形检测 + 二维码识别 + UART 通信', lang: 'C++', stars: 0 },
   { name: 'Web-Security-Learning', desc: '网络安全学习项目，Web 安全 7 主题 + 应急响应 4 主题，配套 Flask 靶场与攻击脚本', lang: 'Markdown', stars: 0 },
   { name: 'auto-publisher', desc: '自动化发布与数据采集工具集，CSDN 自动发布 + 飞书/雨课堂文档采集 + GitHub 仓库管理', lang: 'Python', stars: 0 },
-  { name: 'anime-site', desc: '个人博客网站，纯原生 HTML/CSS/JS 单文件实现，樱花主题 + 左右侧布局', lang: 'CSS', stars: 0 },
+  { name: 'anime-site', desc: '个人博客网站，纯原生 HTML/CSS/JS 实现，罗德岛终端主题 + 左右侧布局', lang: 'CSS', stars: 0 },
 ];
 
 // ---------- 全局状态 ----------
@@ -74,23 +74,24 @@ async function init() {
   } catch(e) {}
 }
 
-// ---------- 樱花飘落 ----------
+// ---------- 数据流粒子（罗德岛终端）----------
 function startSakura() {
   const container = document.getElementById('sakura-container');
-  const emojis = ['🌸', '🌺', '💮'];
-  function createSakura() {
-    const s = document.createElement('div');
-    s.className = 'sakura';
-    s.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-    s.style.left = Math.random() * 100 + '%';
-    s.style.fontSize = (12 + Math.random() * 14) + 'px';
-    s.style.animationDuration = (8 + Math.random() * 8) + 's';
-    s.style.opacity = 0.4 + Math.random() * 0.4;
-    container.appendChild(s);
-    setTimeout(() => s.remove(), 16000);
+  if (!container) return;
+  function createParticle() {
+    const p = document.createElement('div');
+    p.className = 'ri-particle';
+    p.style.left = Math.random() * 100 + '%';
+    const size = 1 + Math.random() * 2;
+    p.style.width = size + 'px';
+    p.style.height = size * (3 + Math.random() * 4) + 'px';
+    p.style.animationDuration = (7 + Math.random() * 9) + 's';
+    p.style.opacity = 0.25 + Math.random() * 0.45;
+    container.appendChild(p);
+    setTimeout(() => p.remove(), 17000);
   }
-  setInterval(createSakura, 600);
-  for (let i = 0; i < 8; i++) setTimeout(createSakura, i * 200);
+  setInterval(createParticle, 420);
+  for (let i = 0; i < 12; i++) setTimeout(createParticle, i * 160);
 }
 
 // ---------- 主题 ----------
@@ -203,7 +204,9 @@ function renderHome(el) {
   const recent = POSTS.slice(0, 5);
   el.innerHTML = `
     <div class="hero">
-      <h1>🌸 RainmeoX</h1>
+      <div class="hero-kicker">▍PRTS // TERMINAL ACCESS</div>
+      <h1>RHODES ISLAND</h1>
+      <p class="hero-sub">RAINMEOX · 罗德岛终端</p>
       <p class="tagline">${PROFILE.bio}<br>用代码点亮喜欢的角色</p>
       <div class="hero-tags">
         ${PROFILE.interests.map(t => `<span class="hero-tag">${t}</span>`).join('')}
