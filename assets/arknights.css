@@ -1,460 +1,435 @@
 /* ============================================================
-   RAINMEOX · RHODES ISLAND TERMINAL THEME
-   明日方舟 / 罗德岛终端风格主题覆盖层
-   在 style.css 之后加载，覆盖其视觉变量与关键样式
+   RAINMEOX · RHODES ISLAND TERMINAL v2
+   配色与字体取自 hexo-theme-arknights（社区还原的官方视觉规范）
+   --theme-highlight #22bbff（亮蓝） --theme-subcolor #ffee22（亮黄）
+   字体：Bender（标题）/ BenderLight（轻量）/ Geometos（几何）/ JetBrainsMono（等宽）
    ============================================================ */
 
-/* ---------- 一、主题变量重定义 ---------- */
+/* ---------- 字体 ---------- */
+@font-face {
+  font-family: 'Bender';
+  src: url('fonts/Bender.ttf') format('truetype');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'BenderLight';
+  src: url('fonts/BenderLight.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Geometos';
+  src: url('fonts/Geometos.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'JetBrainsMono';
+  src: url('fonts/JetBrainsMono-Regular.woff2') format('woff2');
+  font-display: swap;
+}
+
+/* ---------- 主题变量（官方取值）---------- */
 :root {
-  /* 亮色：冷灰工业白 */
-  --bg: #e9ebee;
-  --bg2: #dfe2e6;
-  --bg3: #d3d7dc;
-  --card: rgba(255, 255, 255, 0.9);
+  --ak-highlight: #22bbff;      /* 亮蓝：链接、高亮、数据 */
+  --ak-subcolor: #ffee22;       /* 亮黄：边框、装饰条、强调 */
+  --ak-stress: #c0392b;
+  --ak-btn-bg: #2a272d;
+
+  --bg: #f4f5f6;
+  --bg2: #eceef0;
+  --bg3: #e2e5e8;
+  --card: rgba(255, 255, 255, 0.82);
   --card-hover: #ffffff;
   --card-solid: #ffffff;
-  --border: rgba(26, 30, 35, 0.14);
-  --border-light: rgba(26, 30, 35, 0.07);
-  --text: #171a1e;
-  --text-secondary: #3f454e;
-  --muted: #767e89;
-  --pink: #b45309;          /* 主色 → 罗德岛橙 */
-  --pink-rgb: 180, 83, 9;
-  --pink-light: #d97706;
-  --pink-dark: #7c3a00;
-  --purple: #5c636e;
-  --cyan: #0e7490;
-  --green: #4d7c0f;
-  --yellow: #a16207;
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.07), 0 8px 24px rgba(0, 0, 0, 0.05);
-  --shadow-hover: 0 2px 6px rgba(0, 0, 0, 0.08), 0 12px 32px rgba(180, 83, 9, 0.16);
-  --radius: 3px;
+  --border: rgba(34, 187, 255, 0.35);
+  --border-light: rgba(0, 0, 0, 0.08);
+  --text: #222222;
+  --text-secondary: #3d4147;
+  --muted: #767676;
+  --unimportant-2: #acacac;
+
+  --pink: #0091d5;
+  --pink-rgb: 34, 187, 255;
+  --pink-light: #22bbff;
+  --pink-dark: #0077b3;
+  --purple: #6b7280;
+  --cyan: #22bbff;
+  --green: #00c853;
+  --yellow: #ffee22;
+
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 6px 20px rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 0 0 1px rgba(255, 238, 34, 0.8), 0 8px 26px rgba(34, 187, 255, 0.18);
+  --radius: 2px;
   --radius-sm: 2px;
-  --ri-accent: #b45309;
-  --ri-accent-glow: rgba(180, 83, 9, 0.35);
-  --ri-grid: rgba(26, 30, 35, 0.05);
-  --ri-mono: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+
+  --ak-mono: 'JetBrainsMono', Consolas, monospace;
+  --ak-display: 'Bender', 'Geometos', 'PingFang SC', sans-serif;
+  --ak-grid: rgba(0, 0, 0, 0.045);
 }
 
 [data-theme="dark"] {
-  /* 暗色：终端碳黑 + 源石酸橙绿 */
-  --bg: #0c0e11;
-  --bg2: #12151a;
-  --bg3: #181c22;
+  --bg: #141516;
+  --bg2: #1a1b1d;
+  --bg3: #212225;
   --card: rgba(255, 255, 255, 0.035);
-  --card-hover: rgba(255, 255, 255, 0.065);
-  --card-solid: #12151a;
-  --border: rgba(214, 240, 0, 0.16);
-  --border-light: rgba(255, 255, 255, 0.05);
-  --text: #e7e9ec;
-  --text-secondary: #a9b0b9;
-  --muted: #6d757f;
-  --pink: #d4f000;          /* 主色 → 源石酸橙绿 */
-  --pink-rgb: 212, 240, 0;
-  --pink-light: #e6ff55;
-  --pink-dark: #a5bf00;
-  --purple: #98a1ab;
-  --cyan: #4dd4f0;
-  --green: #86efac;
-  --yellow: #d4f000;
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 8px 28px rgba(0, 0, 0, 0.45);
-  --shadow-hover: 0 0 0 1px rgba(212, 240, 0, 0.25), 0 12px 36px rgba(212, 240, 0, 0.12);
-  --radius: 3px;
-  --radius-sm: 2px;
-  --ri-accent: #d4f000;
-  --ri-accent-glow: rgba(212, 240, 0, 0.4);
-  --ri-grid: rgba(212, 240, 0, 0.045);
+  --card-hover: rgba(255, 255, 255, 0.07);
+  --card-solid: #1a1b1d;
+  --border: rgba(255, 238, 34, 0.42);
+  --border-light: rgba(255, 255, 255, 0.09);
+  --text: #c4c4c4;
+  --text-secondary: #9ea3a8;
+  --muted: #898989;
+  --unimportant-2: #535353;
+
+  --pink: #22bbff;
+  --pink-rgb: 34, 187, 255;
+  --pink-light: #5ccfff;
+  --pink-dark: #0091d5;
+  --ak-btn-bg: #d4d8dd;
+
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.6), 0 8px 28px rgba(0, 0, 0, 0.5);
+  --shadow-hover: 0 0 0 1px rgba(255, 238, 34, 0.7), 0 10px 30px rgba(34, 187, 255, 0.15);
+  --ak-grid: rgba(255, 255, 255, 0.03);
 }
 
-/* ---------- 二、全局基底：网格 + 切角工业感 ---------- */
+/* ---------- 全局 ---------- */
 body {
-  font-family: 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', sans-serif;
+  font-family: 'BenderLight', 'PingFang SC', 'Microsoft YaHei', sans-serif;
   background-color: var(--bg);
   background-image:
-    linear-gradient(var(--ri-grid) 1px, transparent 1px),
-    linear-gradient(90deg, var(--ri-grid) 1px, transparent 1px),
-    radial-gradient(ellipse at 50% 0%, rgba(var(--pink-rgb), 0.06), transparent 60%);
-  background-size: 32px 32px, 32px 32px, 100% 100%;
+    linear-gradient(var(--ak-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--ak-grid) 1px, transparent 1px);
+  background-size: 28px 28px, 28px 28px;
   background-attachment: fixed;
-  letter-spacing: 0.01em;
+  color: var(--text);
+  letter-spacing: 0.02em;
 }
 
-/* 顶部扫描线（终端感） */
+/* 顶部装饰条（方舟标志性四段渐变黄条） */
 body::before {
   content: '';
   position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 2;
-  background: repeating-linear-gradient(
-    180deg,
-    rgba(var(--pink-rgb), 0.022) 0px,
-    rgba(var(--pink-rgb), 0.022) 1px,
-    transparent 1px,
-    transparent 3px
-  );
-  mix-blend-mode: overlay;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  z-index: 1000;
+  background: linear-gradient(90deg,
+    var(--ak-subcolor) 0%, var(--ak-subcolor) 62%,
+    rgba(255, 238, 34, 0.6) 62%, rgba(255, 238, 34, 0.6) 76%,
+    rgba(255, 238, 34, 0.35) 76%, rgba(255, 238, 34, 0.35) 88%,
+    rgba(255, 238, 34, 0.15) 88%, rgba(255, 238, 34, 0.15) 100%);
 }
 
-/* ---------- 三、导航栏：HUD 面板 ---------- */
+/* 底部状态栏 */
+body::after {
+  content: 'PRTS // TERMINAL ONLINE  ·  RHODES ISLAND  ·  LINK ESTABLISHED';
+  position: fixed;
+  left: 0; bottom: 0; right: 0;
+  font-family: var(--ak-mono);
+  font-size: 9px;
+  letter-spacing: 0.26em;
+  color: var(--muted);
+  opacity: 0.55;
+  padding: 5px 14px;
+  pointer-events: none;
+  z-index: 998;
+  background: color-mix(in srgb, var(--bg) 86%, transparent);
+  border-top: 1px solid var(--border-light);
+}
+
+/* ---------- 导航：方舟式顶栏 ---------- */
 .navbar {
-  background: color-mix(in srgb, var(--bg) 88%, transparent);
-  backdrop-filter: blur(14px) saturate(140%);
+  background: color-mix(in srgb, var(--bg) 90%, transparent);
+  backdrop-filter: blur(12px) saturate(150%);
   border-bottom: 1px solid var(--border);
   position: relative;
 }
 .navbar::after {
   content: '';
   position: absolute;
-  left: 0; right: 0; bottom: -1px;
+  left: 0; right: 0; bottom: -2px;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--ri-accent), transparent);
-  opacity: 0.55;
+  background: linear-gradient(90deg,
+    transparent, var(--ak-subcolor) 18%, var(--ak-subcolor) 55%, transparent);
+  opacity: 0.7;
 }
 .nav-brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 800;
-  letter-spacing: 0.16em;
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--ak-display);
+  font-weight: 700;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
-.nav-brand .brand-emoji { display: none; }          /* 隐藏樱花 emoji */
+.nav-brand .brand-emoji { display: none; }
 .nav-brand .brand-text { font-size: 15px; }
 .nav-brand::before {
-  content: 'RI';
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px; height: 30px;
-  font-family: var(--ri-mono);
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--bg);
-  background: var(--ri-accent);
-  clip-path: polygon(0 0, 100% 0, 100% 72%, 72% 100%, 0 100%);
-  letter-spacing: 0;
+  content: '';
+  width: 26px; height: 26px;
+  background: var(--ak-subcolor);
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  box-shadow: 0 0 12px rgba(255, 238, 34, 0.5);
 }
-.nav-brand::after {
-  content: 'RHODES ISLAND';
-  font-family: var(--ri-mono);
-  font-size: 9px;
-  letter-spacing: 0.22em;
-  color: var(--muted);
-  position: absolute;
-  transform: translateY(16px);
-  opacity: 0.85;
-}
-
 .nav-links a {
-  font-size: 13.5px;
-  letter-spacing: 0.04em;
-  padding: 6px 10px;
+  font-family: var(--ak-display);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 6px 12px;
   position: relative;
-  border-radius: 0;
-  transition: color 0.18s;
+  transition: color 0.3s;
 }
-.nav-links a::before {
+.nav-links a::after {
   content: '';
   position: absolute;
-  left: 0; bottom: 2px;
+  left: 50%; bottom: 0;
   width: 0; height: 2px;
-  background: var(--ri-accent);
-  transition: width 0.22s ease;
+  background: var(--ak-subcolor);
+  transform: translateX(-50%);
+  transition: width 0.3s ease;
 }
-.nav-links a:hover::before,
-.nav-links a.active::before { width: calc(100% - 20px); }
-.nav-links a.active { color: var(--ri-accent); font-weight: 700; }
+.nav-links a:hover::after,
+.nav-links a.active::after { width: 70%; }
+.nav-links a.active { color: var(--ak-highlight); }
 
-/* ---------- 四、卡片：切角 + 左侧强调条 ---------- */
-.card,
-.widget,
-.post-card {
+/* ---------- 卡片：切角 + 黄描边 ---------- */
+.card, .widget, .post-card {
   position: relative;
+  background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  background: var(--card);
-  backdrop-filter: blur(8px);
-  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
-  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  backdrop-filter: blur(6px);
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+  transition: border-color 0.3s, box-shadow 0.3s;
 }
-.card:hover,
-.post-card:hover {
-  border-color: rgba(var(--pink-rgb), 0.5);
+.card:hover, .post-card:hover {
+  border-color: var(--ak-subcolor);
   box-shadow: var(--shadow-hover);
 }
-.card::before,
-.post-card::before {
+.card::before, .post-card::before {
   content: '';
   position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 3px;
-  background: linear-gradient(180deg, var(--ri-accent), transparent 85%);
-  opacity: 0.85;
-}
-
-/* ---------- 五、标题：全大写 + 编号前缀 ---------- */
-h1, h2, h3 { letter-spacing: 0.02em; }
-.widget-title,
-.section-title {
-  font-family: var(--ri-mono);
-  font-size: 11.5px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--muted);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-.widget-title::before,
-.section-title::before {
-  content: '▍';
-  color: var(--ri-accent);
-  font-size: 12px;
-}
-.widget-title::after,
-.section-title::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border);
-}
-
-/* ---------- 六、个人卡片：终端档案 ---------- */
-.profile-widget { text-align: center; }
-.profile-avatar {
-  border-radius: 2px !important;
-  border: 1px solid var(--border);
-  position: relative;
-  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
-  filter: saturate(0.9) contrast(1.05);
-}
-.profile-name {
-  font-family: var(--ri-mono);
-  letter-spacing: 0.1em;
-  position: relative;
-}
-.profile-name::after {
-  content: 'DR.';
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%) translateY(15px);
-  font-size: 8.5px;
-  letter-spacing: 0.3em;
-  color: var(--ri-accent);
+  left: 0; top: 0;
+  width: 100%; height: 2px;
+  background: linear-gradient(90deg, var(--ak-subcolor), transparent 70%);
   opacity: 0.9;
 }
-.profile-bio { font-size: 12.5px; color: var(--text-secondary); }
-.profile-location {
-  font-family: var(--ri-mono);
+
+/* ---------- 标题 ---------- */
+.hero h1, .profile-name, h1 {
+  font-family: var(--ak-display);
+  letter-spacing: 0.06em;
+}
+.widget-title, .section-title {
+  font-family: var(--ak-mono);
   font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 12px;
+}
+.widget-title::before, .section-title::before {
+  content: '';
+  width: 3px; height: 12px;
+  background: var(--ak-subcolor);
+}
+.widget-title::after, .section-title::after {
+  content: '';
+  flex: 1; height: 1px;
+  background: linear-gradient(90deg, var(--border), transparent);
+}
+
+/* ---------- 个人卡片 ---------- */
+.profile-widget { text-align: center; }
+.profile-avatar {
+  border: 1px solid var(--border) !important;
+  border-radius: 2px !important;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
+  filter: contrast(1.06) saturate(1.05);
+}
+.profile-name {
+  font-family: var(--ak-display);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.profile-bio { font-family: 'BenderLight', sans-serif; }
+.profile-location {
+  font-family: var(--ak-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
   color: var(--muted);
 }
-.profile-stats { border-top: 1px solid var(--border-light); padding-top: 10px; }
 .stat-num {
-  font-family: var(--ri-mono);
+  font-family: var(--ak-mono);
   font-weight: 700;
-  color: var(--ri-accent);
+  color: var(--ak-highlight);
 }
 .stat-label {
-  font-size: 10.5px;
-  letter-spacing: 0.12em;
+  font-family: var(--ak-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--muted);
 }
+.profile-stats { border-top: 1px solid var(--border-light); }
 
-/* ---------- 七、标签 / 徽章：方舟式 ---------- */
+/* ---------- 标签 ---------- */
 .tag, .badge, .chip {
-  font-family: var(--ri-mono);
+  font-family: var(--ak-mono);
   font-size: 11px;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
+  padding: 2px 9px;
   border: 1px solid var(--border);
   border-radius: 2px;
-  padding: 2px 8px;
-  background: transparent;
   clip-path: polygon(3px 0, 100% 0, 100% calc(100% - 3px), calc(100% - 3px) 100%, 0 100%, 0 3px);
-  transition: all 0.18s;
+  transition: all 0.3s;
 }
 .tag:hover, .badge:hover, .chip:hover {
-  border-color: var(--ri-accent);
-  color: var(--ri-accent);
-  box-shadow: 0 0 12px var(--ri-accent-glow);
+  border-color: var(--ak-subcolor);
+  color: var(--ak-highlight);
+  background: rgba(255, 238, 34, 0.08);
 }
 
-/* ---------- 八、文章卡片：编号 + 元信息 ---------- */
-.post-card {
-  padding: 18px 20px 16px 22px;
-  margin-bottom: 14px;
+/* ---------- 文章卡片 ---------- */
+.post-card { padding: 16px 20px 14px 22px; margin-bottom: 12px; }
+.post-card h3, .post-card .post-title {
+  font-family: var(--ak-display);
+  font-size: 16px;
+  letter-spacing: 0.02em;
 }
-.post-card h3,
-.post-card .post-title {
-  font-size: 16.5px;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-}
-.post-card .post-meta,
-.post-card time {
-  font-family: var(--ri-mono);
-  font-size: 11px;
-  letter-spacing: 0.08em;
+.post-card .post-meta, .post-card time {
+  font-family: var(--ak-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
   color: var(--muted);
 }
-.post-card .post-meta::before {
-  content: '// ';
-  color: var(--ri-accent);
-}
+.post-card .post-meta::before { content: '// '; color: var(--ak-subcolor); }
 
-/* ---------- 九、按钮 ---------- */
+/* ---------- 按钮 ---------- */
 button, .btn, .icon-btn {
   border-radius: 2px;
   border: 1px solid var(--border);
-  transition: all 0.18s;
+  font-family: var(--ak-display);
+  transition: all 0.3s;
 }
 button:hover, .btn:hover, .icon-btn:hover {
-  border-color: var(--ri-accent);
-  color: var(--ri-accent);
-  box-shadow: 0 0 14px var(--ri-accent-glow);
+  border-color: var(--ak-subcolor);
+  color: var(--ak-highlight);
+  box-shadow: 0 0 0 1px rgba(255, 238, 34, 0.4);
 }
 
-/* ---------- 十、装饰：状态栏（左上角 HUD）---------- */
-body::after {
-  content: 'PRTS // TERMINAL ONLINE  ·  LINK ESTABLISHED  ·  RHODES ISLAND';
-  position: fixed;
-  left: 0; bottom: 0;
-  font-family: var(--ri-mono);
-  font-size: 9px;
-  letter-spacing: 0.24em;
-  color: var(--muted);
-  opacity: 0.5;
-  padding: 6px 12px;
-  pointer-events: none;
-  z-index: 999;
-  background: color-mix(in srgb, var(--bg) 80%, transparent);
-  border-top: 1px solid var(--border-light);
-  width: 100%;
-}
-
-/* ---------- 十一、滚动条 ---------- */
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: var(--bg2); }
-::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, var(--ri-accent) 35%, var(--muted));
-  border-radius: 0;
-}
-::-webkit-scrollbar-thumb:hover { background: var(--ri-accent); }
-
-/* ---------- 十二、代码块（终端感）---------- */
-pre, code {
-  font-family: var(--ri-mono) !important;
-  border-radius: 2px;
-}
-pre {
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--ri-accent);
-}
-
-/* ---------- 十三、数据流粒子（替代樱花）---------- */
-.ri-particle {
-  position: absolute;
-  width: 2px;
-  height: 2px;
-  background: var(--ri-accent);
-  opacity: 0.55;
-  box-shadow: 0 0 6px var(--ri-accent);
-  animation: ri-fall linear infinite;
-}
-@keyframes ri-fall {
-  0%   { transform: translateY(-10px); opacity: 0; }
-  8%   { opacity: 0.6; }
-  92%  { opacity: 0.6; }
-  100% { transform: translateY(100vh); opacity: 0; }
-}
-
-/* ---------- 十四、Hero 区（终端启动屏）---------- */
+/* ---------- Hero（终端启动屏）---------- */
 .hero {
   position: relative;
-  padding: 26px 0 22px;
-  border-bottom: 1px solid var(--border);
+  padding: 24px 0 22px;
+  border-bottom: 1px solid var(--border-light);
   margin-bottom: 26px;
 }
 .hero::after {
-  content: 'EST. 2017 // RHODES ISLAND PHARMACEUTICAL';
+  content: 'EST. 2017  //  RHODES ISLAND PHARMACEUTICAL';
   position: absolute;
-  right: 0; top: 30px;
-  font-family: var(--ri-mono);
+  right: 0; top: 26px;
+  font-family: var(--ak-mono);
   font-size: 9px;
-  letter-spacing: 0.2em;
-  color: var(--muted);
-  opacity: 0.6;
+  letter-spacing: 0.22em;
+  color: var(--unimportant-2);
 }
 .hero-kicker {
-  font-family: var(--ri-mono);
+  font-family: var(--ak-mono);
   font-size: 10px;
-  letter-spacing: 0.24em;
-  color: var(--ri-accent);
+  letter-spacing: 0.26em;
+  color: var(--ak-subcolor);
   margin-bottom: 12px;
   text-transform: uppercase;
+  text-shadow: 0 0 10px rgba(255, 238, 34, 0.4);
 }
 .hero h1 {
-  font-family: var(--ri-mono);
-  font-size: clamp(26px, 5vw, 40px);
-  font-weight: 800;
-  letter-spacing: 0.08em;
+  font-family: var(--ak-display);
+  font-size: clamp(28px, 5.4vw, 44px);
+  font-weight: 700;
+  letter-spacing: 0.1em;
   line-height: 1.05;
   margin: 0;
-  background: linear-gradient(92deg, var(--text) 0%, var(--text) 55%, var(--ri-accent) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--text);
 }
 .hero-sub {
-  font-family: var(--ri-mono);
-  font-size: 11.5px;
-  letter-spacing: 0.32em;
-  color: var(--muted);
+  font-family: var(--ak-mono);
+  font-size: 11px;
+  letter-spacing: 0.34em;
+  color: var(--ak-highlight);
   margin-top: 10px;
   text-transform: uppercase;
 }
 .hero .tagline {
-  margin-top: 16px;
+  margin-top: 14px;
   color: var(--text-secondary);
-  font-size: 14px;
-  line-height: 1.7;
+  font-size: 13.5px;
+  line-height: 1.75;
+  font-family: 'BenderLight', sans-serif;
 }
-.hero-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 16px;
-}
+.hero-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; }
 .hero-tag {
-  font-family: var(--ri-mono);
+  font-family: var(--ak-mono);
   font-size: 11px;
-  letter-spacing: 0.05em;
-  padding: 3px 9px;
+  padding: 3px 10px;
   border: 1px solid var(--border);
   color: var(--text-secondary);
   clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px);
-  transition: all 0.18s;
+  transition: all 0.3s;
 }
 .hero-tag:hover {
-  border-color: var(--ri-accent);
-  color: var(--ri-accent);
-  box-shadow: 0 0 12px var(--ri-accent-glow);
+  border-color: var(--ak-subcolor);
+  color: var(--ak-highlight);
+  background: rgba(255, 238, 34, 0.08);
 }
 .section-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
+  display: flex; align-items: baseline; justify-content: space-between;
   margin-bottom: 14px;
 }
 .section-count {
-  font-family: var(--ri-mono);
+  font-family: var(--ak-mono);
   font-size: 11px;
   letter-spacing: 0.1em;
   color: var(--muted);
 }
-.section-count:hover { color: var(--ri-accent); }
+.section-count:hover { color: var(--ak-highlight); }
 .empty-state { text-align: center; padding: 40px 0; color: var(--muted); }
-.empty-icon { font-size: 28px; margin-bottom: 8px; opacity: 0.5; }
+.empty-icon { font-size: 26px; margin-bottom: 8px; opacity: 0.5; }
+
+/* ---------- 代码块 / 滚动条 ---------- */
+pre, code { font-family: var(--ak-mono) !important; border-radius: 2px; }
+pre {
+  border: 1px solid var(--border-light);
+  border-left: 3px solid var(--ak-subcolor);
+}
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--ak-highlight) 40%, var(--muted)); }
+::-webkit-scrollbar-thumb:hover { background: var(--ak-highlight); }
+
+/* ---------- 数据流粒子 ---------- */
+.ri-particle {
+  position: absolute;
+  width: 2px;
+  background: var(--ak-subcolor);
+  opacity: 0.5;
+  box-shadow: 0 0 6px rgba(255, 238, 34, 0.7);
+  animation: ri-fall linear infinite;
+}
+@keyframes ri-fall {
+  0%   { transform: translateY(-10px); opacity: 0; }
+  8%   { opacity: 0.5; }
+  92%  { opacity: 0.5; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
+/* ---------- 入场动画（终端加载感）---------- */
+@keyframes ak-fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.hero, .card, .widget, .post-card {
+  animation: ak-fade-up 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+.post-card:nth-child(2) { animation-delay: 0.05s; }
+.post-card:nth-child(3) { animation-delay: 0.1s; }
+.post-card:nth-child(4) { animation-delay: 0.15s; }
+.post-card:nth-child(5) { animation-delay: 0.2s; }
