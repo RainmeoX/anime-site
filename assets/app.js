@@ -417,6 +417,7 @@ const NAV_ORDER = ['/', '/blog', '/projects', '/tags', '/about'];
 
 function initReveal() {
   const els = document.querySelectorAll('.ri-item, .ri-card, .ri-term, .ri-sec-title, .ri-page-head, .ri-list-head');
+  if (!els.length) return;
   if (!('IntersectionObserver' in window)) { els.forEach(e => e.classList.add('in')); return; }
   const io = new IntersectionObserver(entries => {
     entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
@@ -426,6 +427,8 @@ function initReveal() {
     el.style.transitionDelay = (Math.min(i % 9, 8) * 0.04) + 's';
     io.observe(el);
   });
+  // 兜底：1.6s 后强制显示全部，避免观察器未触发导致内容隐身
+  setTimeout(() => els.forEach(e => e.classList.add('in')), 1600);
 }
 
 function initScrollFx() {
