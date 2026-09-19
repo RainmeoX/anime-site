@@ -61,6 +61,9 @@
   transition: opacity .6s var(--ak-ease), visibility .6s;
 }
 #ri-loader.done { opacity: 0; visibility: hidden; pointer-events: none; }
+/* JS 兜底：即使脚本没跑/报错，3.5 秒后也自动隐藏，绝不卡住页面 */
+#ri-loader { animation: ri-loader-failsafe .6s ease 3.5s forwards; }
+@keyframes ri-loader-failsafe { to { opacity: 0; visibility: hidden; pointer-events: none; } }
 #ri-loader::before {
   content: ''; position: absolute; inset: 0; pointer-events: none;
   background: repeating-linear-gradient(0deg, rgba(24,209,255,.05) 0 1px, transparent 1px 3px);
