@@ -1,30 +1,30 @@
 /* ============================================
-   RainmeoX 樱花博客 · 主逻辑
-   左右侧布局 + 樱花飘落动画
+   RAINMEOX · RHODES ISLAND TERMINAL v5
+   全站架构重构（仿 ak.hypergryph.com 官网）
+   顶栏中英双行导航 + 右侧竖栏 + 全屏舞台 + 情报式列表
    ============================================ */
 
-// ---------- 配置 ----------
+// ---------- 数据层 ----------
 const DEFAULT_PROFILE = {
   name: 'RainmeoX',
+  role: 'PRTS TERMINAL ADMIN',
   bio: '大模型微调 · 推理部署 · 嵌入式 AI · 全栈开发',
   avatar: 'assets/images/avatar.jpg',
   github: 'https://github.com/RainmeoX',
   csdn: 'https://blog.csdn.net/m0_67166125',
   blog: 'https://www.rainmeo.xyz',
   elecfans: 'https://bbs.elecfans.com/user/6963000/',
+  mail: 'mailto:2692738315@qq.com',
   location: '中国 · 深圳',
   skills: ['Python', 'PyTorch', 'LoRA 微调', 'vLLM', 'ROCm', 'Transformers', 'ChromaDB', 'K230', 'MicroPython', 'JavaScript', 'HTML/CSS', 'Selenium', 'Flask'],
   interests: ['大模型微调', '推理部署', 'RAG 应用', '嵌入式 AI', '网络安全', '自动化工具']
 };
 
-// 动态获取 PROFILE（合并自定义配置）
 function getProfile() {
   try {
     const custom = JSON.parse(localStorage.getItem('rainmeo_profile') || '{}');
     return { ...DEFAULT_PROFILE, ...custom };
-  } catch (e) {
-    return DEFAULT_PROFILE;
-  }
+  } catch (e) { return DEFAULT_PROFILE; }
 }
 let PROFILE = getProfile();
 
@@ -36,158 +36,129 @@ const PROJECTS = [
   { name: 'K230-Vision-System', desc: '基于 K230 AI 芯片的多功能嵌入式视觉检测系统，三角形/圆形/矩形检测 + 二维码识别 + UART 通信', lang: 'C++', stars: 0 },
   { name: 'Web-Security-Learning', desc: '网络安全学习项目，Web 安全 7 主题 + 应急响应 4 主题，配套 Flask 靶场与攻击脚本', lang: 'Markdown', stars: 0 },
   { name: 'auto-publisher', desc: '自动化发布与数据采集工具集，CSDN 自动发布 + 飞书/雨课堂文档采集 + GitHub 仓库管理', lang: 'Python', stars: 0 },
-  { name: 'anime-site', desc: '个人博客网站，纯原生 HTML/CSS/JS 实现，罗德岛终端主题 + 左右侧布局', lang: 'CSS', stars: 0 },
+  { name: 'anime-site', desc: '个人网站，纯原生 HTML/CSS/JS，罗德岛终端主题（archived 旧版）', lang: 'CSS', stars: 0 },
 ];
 
-// ---------- 全局状态 ----------
+// 路由定义（仿官网导航结构）
+const ROUTES = {
+  '/':         { en: 'INDEX',       cn: '首页', page: 'HOMEPAGE',    code: '01' },
+  '/blog':     { en: 'INFORMATION', cn: '情报', page: 'INFORMATION', code: '02' },
+  '/projects': { en: 'OPERATOR',    cn: '项目', page: 'OPERATOR',    code: '03' },
+  '/tags':     { en: 'WORLD',       cn: '标签', page: 'WORLD',       code: '04' },
+  '/about':    { en: 'MEDIA',       cn: '关于', page: 'MEDIA',       code: '05' },
+};
+
 let POSTS = [];
-let CURRENT_THEME = localStorage.getItem('theme') || 'light';
+let CURRENT_THEME = localStorage.getItem('theme') || 'dark';
 
-// ---------- 初始化 ----------
-async function init() {
-  applyTheme();
-  await loadPosts();
-  bindEvents();
-  startSakura();
-  renderSidebar();
-  router();
-  // star 数已写死在 PROJECTS 数组，不再实时调 GitHub API（避免未鉴权限流）
-  // 监听管理面板的刷新事件
-  window.addEventListener('blog:refresh', async () => {
-    PROFILE = getProfile();  // 重新加载个人资料
-    await loadPosts();
-    renderSidebar();
-    router();
-  });
+// ---------- 工具 ----------
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const dateSplit = d => {
+  // 2026-09-19 → 2026 // 09 / 19
+  const m = String(d || '').match(/(\d{4})-(\d{2})-(\d{2})/);
+  return m ? `${m[1]} // ${m[2]} / ${m[3]}` : (d || '');
+};
 
-  // 跨标签页通信：接收后台管理面板的配置变更通知
+// ---------- 加载文章 ----------
+async function loadPosts() {
   try {
-    const bc = new BroadcastChannel('rainmeo_blog');
-    bc.onmessage = async (e) => {
-      if (e.data.type === 'config_changed') {
-        PROFILE = getProfile();
-        await loadPosts();
-        renderSidebar();
-        router();
-      }
-    };
-  } catch(e) {}
-}
-
-// ---------- 数据流粒子（罗德岛终端）----------
-function startSakura() {
-  const container = document.getElementById('sakura-container');
-  if (!container) return;
-  function createParticle() {
-    const p = document.createElement('div');
-    p.className = 'ri-particle';
-    p.style.left = Math.random() * 100 + '%';
-    const size = 1 + Math.random() * 2;
-    p.style.width = size + 'px';
-    p.style.height = size * (3 + Math.random() * 4) + 'px';
-    p.style.animationDuration = (7 + Math.random() * 9) + 's';
-    p.style.opacity = 0.25 + Math.random() * 0.45;
-    container.appendChild(p);
-    setTimeout(() => p.remove(), 17000);
-  }
-  setInterval(createParticle, 420);
-  for (let i = 0; i < 12; i++) setTimeout(createParticle, i * 160);
+    const res = await fetch('posts/posts.json?v=5');
+    if (res.ok) { POSTS = await res.json(); return; }
+  } catch (e) {}
+  try {
+    const r2 = await fetch('posts/posts.json');
+    if (r2.ok) POSTS = await r2.json();
+  } catch (e) { POSTS = []; }
 }
 
 // ---------- 主题 ----------
 function applyTheme() {
   document.documentElement.setAttribute('data-theme', CURRENT_THEME);
   localStorage.setItem('theme', CURRENT_THEME);
+  const btn = $('themeBtn');
+  if (btn) btn.textContent = CURRENT_THEME === 'dark' ? '☀' : '◐';
 }
 
-// ---------- 加载文章 ----------
-async function loadPosts() {
-  try {
-    const res = await fetch('posts/posts.json');
-    const builtin = await res.json();
-    // 合并自定义文章（来自管理面板）
-    const custom = JSON.parse(localStorage.getItem('rainmeo_custom_posts') || '[]');
-    POSTS = [...custom, ...builtin];
-    // 置顶的排前面
-    POSTS.sort((a, b) => {
-      if (a.pinned && !b.pinned) return -1;
-      if (!a.pinned && b.pinned) return 1;
-      return new Date(b.date) - new Date(a.date);
-    });
-  } catch (e) {
-    console.error('加载文章失败', e);
-    const custom = JSON.parse(localStorage.getItem('rainmeo_custom_posts') || '[]');
-    POSTS = custom;
-  }
-}
-
-// ---------- 渲染侧边栏 ----------
-function renderSidebar() {
-  // 读取侧边栏模块开关配置
-  let widgets = {};
-  try {
-    widgets = JSON.parse(localStorage.getItem('rainmeo_widgets') || '{}');
-  } catch (e) {}
-
-  // 根据配置控制各模块显示/隐藏
-  const toggleWidget = (selector, key) => {
-    const el = document.querySelector(selector);
-    if (el) el.style.display = widgets[key] === false ? 'none' : '';
+// ---------- 粒子 ----------
+function startParticles() {
+  const box = $('ri-particles');
+  if (!box) return;
+  const make = () => {
+    const p = document.createElement('div');
+    p.className = 'ri-particle';
+    p.style.left = Math.random() * 100 + '%';
+    const w = 1 + Math.random() * 2;
+    p.style.width = w + 'px';
+    p.style.height = w * (3 + Math.random() * 4) + 'px';
+    p.style.animationDuration = (7 + Math.random() * 9) + 's';
+    p.style.opacity = 0.2 + Math.random() * 0.4;
+    box.appendChild(p);
+    setTimeout(() => p.remove(), 17000);
   };
-  toggleWidget('.profile-widget', 'profile');
-  toggleWidget('.profile-stats', 'stats');
-  toggleWidget('.tag-cloud-widget', 'tags');
-  toggleWidget('.recent-posts-widget', 'recent');
-  toggleWidget('.links-widget', 'links');
+  setInterval(make, 420);
+  for (let i = 0; i < 12; i++) setTimeout(make, i * 160);
+}
 
-  // 统计
-  document.getElementById('statPosts').textContent = POSTS.length;
-  document.getElementById('statProjects').textContent = PROJECTS.length;
-  const allTags = new Set();
-  POSTS.forEach(p => (p.tags || []).forEach(t => allTags.add(t)));
-  document.getElementById('statTags').textContent = allTags.size;
-
-  // 技能标签云
-  const tagCloud = document.getElementById('tagCloud');
-  tagCloud.innerHTML = PROFILE.skills.map(s =>
-    `<span class="tag-item" onclick="location.hash='#/tags'">${s}</span>`
-  ).join('');
-
-  // 最近文章（取前 5 篇）
-  const recentList = document.getElementById('recentList');
-  const recent = POSTS.slice(0, 5);
-  recentList.innerHTML = recent.length === 0
-    ? '<li style="color:var(--muted);font-size:13px;">暂无文章</li>'
-    : recent.map(p => `
-      <li>
-        <a href="#/post/${encodeURIComponent(p.file)}">${p.title}</a>
-        <span class="recent-date">${p.date}</span>
-      </li>
-    `).join('');
-
-  // 动态渲染友链（从后台管理读取）
-  const links = JSON.parse(localStorage.getItem('rainmeo_links') || 'null');
-  if (links && links.length > 0) {
-    const linksList = document.querySelector('.links-list');
-    if (linksList) {
-      linksList.innerHTML = links.map(l =>
-        `<li><a href="${l.url}" target="_blank" rel="noopener"><span>${l.name}</span></a></li>`
-      ).join('');
-    }
+// ---------- 竖栏 ----------
+function renderRail() {
+  const links = $('riRailLinks');
+  if (links) {
+    links.innerHTML = Object.entries(ROUTES).map(([path, r]) => `
+      <a class="ri-rail-link" data-rail="${path}" href="#${path}">
+        <span class="n">${r.code}</span><span>${r.cn}</span>
+      </a>`).join('');
   }
+  const pf = $('riRailProfile');
+  if (pf) {
+    pf.innerHTML = `
+      <img class="ri-rail-avatar" src="${esc(PROFILE.avatar)}" alt="${esc(PROFILE.name)}"
+           onerror="this.style.visibility='hidden'">
+      <div class="ri-rail-name">${esc(PROFILE.name)}</div>
+      <div class="ri-rail-role">${esc(PROFILE.role || 'DR.')}</div>
+      <div class="ri-rail-bio">${esc(PROFILE.bio)}</div>
+      <div class="ri-rail-socials">
+        <a class="ri-rail-social" href="${esc(PROFILE.github)}" target="_blank" rel="noopener">GITHUB</a>
+        <a class="ri-rail-social" href="${esc(PROFILE.csdn)}" target="_blank" rel="noopener">CSDN</a>
+        <a class="ri-rail-social" href="${esc(PROFILE.elecfans)}" target="_blank" rel="noopener">ELECFANS</a>
+        <a class="ri-rail-social" href="${esc(PROFILE.mail)}">MAIL</a>
+      </div>`;
+  }
+  const loc = $('riFootLoc');
+  if (loc) loc.textContent = PROFILE.location;
+}
+
+// ---------- 时钟 ----------
+function startClock() {
+  const tick = () => {
+    const d = new Date(), p = n => String(n).padStart(2, '0');
+    const el = $('riClock');
+    if (el) el.textContent = `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+  };
+  tick(); setInterval(tick, 1000);
 }
 
 // ---------- 路由 ----------
 function router() {
-  const hash = location.hash.slice(1) || '/';
-  const main = document.getElementById('mainContent');
-  main.innerHTML = '';
+  const hash = (location.hash.slice(1) || '/');
+  const main = $('mainContent');
+  if (!main) return;
+  const base = hash.startsWith('/post/') ? '/blog' : hash;
 
-  // 更新导航激活态
-  document.querySelectorAll('.nav-links a').forEach(a => {
-    a.classList.toggle('active', a.getAttribute('data-route') === hash);
+  // 更新顶栏激活态
+  document.querySelectorAll('.ri-nav-item').forEach(a => {
+    a.classList.toggle('active', a.getAttribute('data-route') === base);
   });
+  // 更新竖栏激活态
+  document.querySelectorAll('.ri-rail-link').forEach(a => {
+    a.classList.toggle('active', a.dataset.rail === base);
+  });
+  // 更新页面名与水印
+  const r = ROUTES[base] || ROUTES['/'];
+  const pn = $('riPageName'); if (pn) pn.textContent = r.page;
+  const wm = $('riWatermark'); if (wm) wm.textContent = r.en === 'INDEX' ? 'RAINMEOX' : r.en;
 
+  main.innerHTML = '';
   if (hash === '/') renderHome(main);
   else if (hash === '/blog') renderBlog(main);
   else if (hash === '/projects') renderProjects(main);
@@ -195,393 +166,255 @@ function router() {
   else if (hash === '/about') renderAbout(main);
   else if (hash.startsWith('/post/')) renderPost(main, decodeURIComponent(hash.slice(6)));
   else renderHome(main);
-
   window.scrollTo(0, 0);
+}
+
+// ---------- 页头 ----------
+function pageHead(en, cn, desc, meta) {
+  return `
+    <div class="ri-page-head">
+      <div class="ri-page-en">${esc(en)}</div>
+      <h1 class="ri-page-title">${esc(en)}</h1>
+      <div class="ri-page-cn">${esc(cn)}</div>
+      ${desc ? `<p class="ri-page-desc">${desc}</p>` : ''}
+      ${meta ? `<div class="ri-page-meta">${meta}</div>` : ''}
+    </div>`;
+}
+
+// ---------- 情报条目 ----------
+function itemHTML(p) {
+  const tags = (p.tags || []).slice(0, 3).map(t => `<span class="ri-tag">${esc(t)}</span>`).join('');
+  const file = p.file || p.slug || '';
+  return `
+    <a class="ri-item" href="#/post/${encodeURIComponent(file)}">
+      <span class="ri-item-date">${esc(dateSplit(p.date))}</span>
+      <span class="ri-item-main">
+        <span class="ri-item-title">${esc(p.title || '(无标题)')}</span>
+        ${p.excerpt ? `<span class="ri-item-excerpt">${esc(p.excerpt)}</span>` : ''}
+      </span>
+      <span class="ri-item-tags">${tags}</span>
+    </a>`;
 }
 
 // ---------- 首页 ----------
 function renderHome(el) {
-  const recent = POSTS.slice(0, 5);
+  const recent = POSTS.slice(0, 6);
   el.innerHTML = `
-    <div class="hero">
-      <div class="hero-kicker">PRTS // TERMINAL ACCESS</div>
-      <h1>RHODES ISLAND</h1>
-      <p class="hero-sub">RAINMEOX · 罗德岛终端</p>
-      <p class="tagline">${PROFILE.bio}<br>用代码点亮喜欢的角色</p>
-      <div class="hero-tags">
-        ${PROFILE.interests.map(t => `<span class="hero-tag">${t}</span>`).join('')}
-      </div>
-      <div class="ri-deco-diamond"></div>
-      <div class="ri-vertical" style="position:absolute;right:30px;top:74px">RHODES ISLAND</div>
+    ${pageHead('INDEX', '罗德岛终端', `${esc(PROFILE.bio)}<br>用代码点亮喜欢的角色。这里存放我的情报、项目与实验记录。`,
+      `<span>STATUS <b>ONLINE</b></span><span>LOCATION <b>${esc(PROFILE.location)}</b></span><span>POSTS <b>${POSTS.length}</b></span><span>PROJECTS <b>${PROJECTS.length}</b></span>`)}
+
+    <div class="ri-sec-title">TERMINOLOGY // 关键词</div>
+    <div class="ri-terms">
+      ${PROFILE.interests.map((t, i) => `
+        <div class="ri-term">
+          <div class="ri-term-en">TERM-${String(i + 1).padStart(2, '0')}</div>
+          <div class="ri-term-cn">${esc(t)}</div>
+        </div>`).join('')}
     </div>
 
-    <div class="section-header">
-      <h2 class="section-title">最新文章</h2>
-      <a href="#/blog" class="section-count">查看全部 →</a>
+    <div class="ri-sec-title">LATEST INTELLIGENCE // 最新情报</div>
+    <div class="ri-list">
+      <div class="ri-list-head"><span>DATE</span><span>ARCHIVE</span></div>
+      ${recent.length ? recent.map(itemHTML).join('') : '<div class="ri-empty">NO RECORDS // 暂无记录</div>'}
     </div>
-    <div class="post-list">
-      ${recent.length === 0
-        ? '<div class="empty-state"><div class="empty-icon">📝</div>暂无文章</div>'
-        : recent.map(postCardHTML).join('')}
-    </div>
+    <div style="margin-top:18px"><a class="ri-more" href="#/blog">READ MORE // 查看全部 →</a></div>
   `;
 }
 
-// ---------- 博客页 ----------
+// ---------- 情报页 ----------
 function renderBlog(el) {
   el.innerHTML = `
-    <div class="section-header">
-      <h2 class="section-title">全部文章</h2>
-      <span class="section-count">${POSTS.length} 篇</span>
-    </div>
-    <div class="post-list">
-      ${POSTS.length === 0
-        ? '<div class="empty-state"><div class="empty-icon">📝</div>暂无文章</div>'
-        : POSTS.map(postCardHTML).join('')}
-    </div>
-  `;
-}
-
-// ---------- 文章卡片 HTML ----------
-function postCardHTML(p) {
-  const date = new Date(p.date);
-  const day = date.getDate();
-  const month = (date.getMonth() + 1) + '月';
-  return `
-    <div class="post-card" onclick="location.hash='#/post/${encodeURIComponent(p.file)}'">
-      <div class="post-date">
-        <span class="day">${day}</span>
-        <span class="month">${month}</span>
-      </div>
-      <div class="post-content">
-        <a href="#/post/${encodeURIComponent(p.file)}" class="post-title">${p.title}</a>
-        <p class="post-excerpt">${p.excerpt || ''}</p>
-        <div class="post-tags">
-          ${(p.tags || []).slice(0, 4).map(t => `<span class="post-tag">${t}</span>`).join('')}
-        </div>
-      </div>
-    </div>
-  `;
+    ${pageHead('INFORMATION', '情报档案', '所有已归档的作战记录与技术笔记。', `<span>ARCHIVES <b>${POSTS.length}</b></span>`)}
+    <div class="ri-list">
+      <div class="ri-list-head"><span>DATE</span><span>ARCHIVE</span></div>
+      ${POSTS.length ? POSTS.map(itemHTML).join('') : '<div class="ri-empty">NO RECORDS // 暂无记录</div>'}
+    </div>`;
 }
 
 // ---------- 项目页 ----------
 function renderProjects(el) {
   el.innerHTML = `
-    <div class="section-header">
-      <h2 class="section-title">开源项目</h2>
-      <span class="section-count">${PROJECTS.length} 个</span>
-    </div>
-    <div class="project-grid">
-      ${PROJECTS.map(p => `
-        <a class="project-card" href="https://github.com/RainmeoX/${p.name}" target="_blank" rel="noopener">
-          <div class="project-name">${p.name}</div>
-          <div class="project-desc">${p.desc}</div>
-          <div class="project-meta">
-            <span class="project-lang">${p.lang}</span>
-            <span data-repo="${p.name}">⭐ ${p.stars}</span>
+    ${pageHead('OPERATOR', '干员档案', '我参与构建的工程与实验项目。', `<span>OPERATORS <b>${PROJECTS.length}</b></span>`)}
+    <div class="ri-cards">
+      ${PROJECTS.map((p, i) => `
+        <div class="ri-card">
+          <div class="ri-card-head">
+            <div class="ri-card-name">${String(i + 1).padStart(2, '0')} · ${esc(p.name)}</div>
+            <div class="ri-card-lang">${esc(p.lang)}</div>
           </div>
-        </a>
-      `).join('')}
-    </div>
-  `;
+          <div class="ri-card-desc">${esc(p.desc)}</div>
+          <div class="ri-card-foot">
+            <span>★ ${p.stars || 0}</span>
+            <a class="ri-more" href="https://github.com/RainmeoX/${esc(p.name)}" target="_blank" rel="noopener">REPO →</a>
+          </div>
+        </div>`).join('')}
+    </div>`;
 }
 
 // ---------- 标签页 ----------
 function renderTags(el) {
-  const tagMap = {};
-  POSTS.forEach(p => (p.tags || []).forEach(t => {
-    if (!tagMap[t]) tagMap[t] = [];
-    tagMap[t].push(p);
-  }));
-  const tags = Object.keys(tagMap).sort((a, b) => tagMap[b].length - tagMap[a].length);
+  const map = {};
+  POSTS.forEach(p => (p.tags || []).forEach(t => { map[t] = (map[t] || 0) + 1; }));
+  const tags = Object.entries(map).sort((a, b) => b[1] - a[1]);
   el.innerHTML = `
-    <div class="section-header">
-      <h2 class="section-title">标签</h2>
-      <span class="section-count">${tags.length} 个</span>
+    ${pageHead('WORLD', '世界构成', '按标签索引全部档案。', `<span>TAGS <b>${tags.length}</b></span>`)}
+    <div class="ri-terms">
+      ${tags.length ? tags.map(([t, n]) => `
+        <div class="ri-term" onclick="location.hash='#/blog'">
+          <div class="ri-term-en">${esc(t)}</div>
+          <div class="ri-term-cn">${n} 篇档案</div>
+        </div>`).join('') : '<div class="ri-empty">NO TAGS // 暂无标签</div>'}
     </div>
-    <div class="post-list">
-      ${tags.map(t => `
-        <div class="post-card" style="cursor:default;">
-          <div class="post-content">
-            <h3 style="color:var(--pink);margin-bottom:12px;">🏷 ${t} <span style="font-size:13px;color:var(--muted);">(${tagMap[t].length})</span></h3>
-            ${tagMap[t].map(p => `
-              <div style="padding:8px 0;border-bottom:1px solid var(--border-light);">
-                <a href="#/post/${encodeURIComponent(p.file)}" style="color:var(--text-secondary);text-decoration:none;font-size:14px;">${p.title}</a>
-                <span style="font-size:12px;color:var(--muted);margin-left:8px;">${p.date}</span>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      `).join('')}
-    </div>
-  `;
+    <div class="ri-sec-title">SKILLS // 技能树</div>
+    <div class="ri-terms">
+      ${PROFILE.skills.map((s, i) => `
+        <div class="ri-term">
+          <div class="ri-term-en">SKILL-${String(i + 1).padStart(2, '0')}</div>
+          <div class="ri-term-cn">${esc(s)}</div>
+        </div>`).join('')}
+    </div>`;
 }
 
 // ---------- 关于页 ----------
 function renderAbout(el) {
   el.innerHTML = `
-    <div class="section-header">
-      <h2 class="section-title">关于我</h2>
+    ${pageHead('MEDIA', '关于本终端', '罗德岛制药 · 终端管理员档案。',
+      `<span>NAME <b>${esc(PROFILE.name)}</b></span><span>ROLE <b>${esc(PROFILE.role || 'DR.')}</b></span><span>LOCATION <b>${esc(PROFILE.location)}</b></span>`)}
+    <div class="ri-sec-title">PROFILE // 档案</div>
+    <div class="ri-article" style="max-width:70ch">
+      <p>我是 <b>${esc(PROFILE.name)}</b>，电子信息科学与技术专业在读（嵌入式方向）。目前主要在做大模型微调与推理部署，同时折腾嵌入式 AI（K230）、网络通信与自动化工具。</p>
+      <p>这个终端用来归档我的技术笔记、项目记录与实验数据。界面视觉参考《明日方舟》官网的设计规范（字体、配色、动效均取自官方 CDN）。</p>
     </div>
-    <div class="about-card">
-      <h2>🌸 RainmeoX</h2>
-      <p>${PROFILE.bio}</p>
-      <p>📍 ${PROFILE.location}</p>
-      <p>专注大语言模型微调、高性能推理部署与嵌入式边缘视觉，掌握 Transformer 架构、LoRA 参数高效微调与 vLLM 推理优化技术。基于 AMD ROCm 生态独立完成 Qwen3-4B、Qwen3-0.6B、Gemma4-E4B 三个大模型的 LoRA 微调与部署，具备从数据集构建、模型训练、推理服务到前端 UI 的全链路交付能力；同时具备 K230 嵌入式视觉算法开发经验。</p>
-      <h2 style="margin-top:24px;">🛠 技能栈</h2>
-      <div class="about-skills">
-        ${PROFILE.skills.map(s => `<span class="about-skill">${s}</span>`).join('')}
-      </div>
-      <h2 style="margin-top:24px;">🔗 链接</h2>
-      <p>
-        GitHub: <a href="${PROFILE.github}" target="_blank" style="color:var(--pink);">${PROFILE.github}</a><br>
-        CSDN: <a href="${PROFILE.csdn}" target="_blank" style="color:var(--pink);">${PROFILE.csdn}</a><br>
-        博客: <a href="${PROFILE.blog}" target="_blank" style="color:var(--pink);">${PROFILE.blog}</a><br>
-        电子发烧友: <a href="${PROFILE.elecfans}" target="_blank" style="color:var(--pink);">${PROFILE.elecfans}</a>
-      </p>
-    </div>
-  `;
+    <div class="ri-sec-title">CONTACT // 联系方式</div>
+    <div class="ri-terms">
+      <a class="ri-term" href="${esc(PROFILE.github)}" target="_blank" rel="noopener"><div class="ri-term-en">GITHUB</div><div class="ri-term-cn">RainmeoX</div></a>
+      <a class="ri-term" href="${esc(PROFILE.csdn)}" target="_blank" rel="noopener"><div class="ri-term-en">CSDN</div><div class="ri-term-cn">博客主页</div></a>
+      <a class="ri-term" href="${esc(PROFILE.elecfans)}" target="_blank" rel="noopener"><div class="ri-term-en">ELECFANS</div><div class="ri-term-cn">电子发烧友</div></a>
+      <a class="ri-term" href="${esc(PROFILE.mail)}"><div class="ri-term-en">MAIL</div><div class="ri-term-cn">2692738315@qq.com</div></a>
+    </div>`;
 }
 
-// ---------- 文章详情 ----------
+// ---------- 文章页 ----------
 async function renderPost(el, file) {
-  el.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div>加载中...</div>';
+  el.innerHTML = `<div class="ri-empty">LOADING // 正在解密档案……</div>`;
   try {
-    const post = POSTS.find(p => p.file === file) || {};
-    let md = '';
-    // 优先从自定义文章读取
-    if (post.custom) {
-      const customPosts = JSON.parse(localStorage.getItem('rainmeo_custom_posts') || '[]');
-      const found = customPosts.find(p => p.file === file);
-      md = found ? found.content : '';
-    } else {
-      const res = await fetch(`posts/${file}`);
-      if (!res.ok) throw new Error('文章不存在');
-      md = await res.text();
-    }
-    const html = marked.parse(md);
+    const res = await fetch('posts/' + file);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const md = await res.text();
+    const meta = POSTS.find(p => (p.file === file || p.slug === file)) || {};
+    const html = (typeof marked !== 'undefined')
+      ? marked.parse(md, { gfm: true, breaks: false })
+      : '<pre>' + esc(md) + '</pre>';
     el.innerHTML = `
-      <button class="back-btn" onclick="history.back()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-        返回
-      </button>
-      <article class="post-detail">
-        <h1 class="post-title-large">${post.title || file}${post.pinned ? ' <span style="color:var(--pink);font-size:14px;">📌 置顶</span>' : ''}</h1>
-        <div class="post-meta">
-          <span>📅 ${post.date || ''}</span>
-          <span>📂 ${post.category || ''}</span>
-          <span>🏷 ${(post.tags || []).join(', ')}</span>
-        </div>
-        <div id="toc-placeholder"></div>
-        <div class="post-body">${html}</div>
-        ${buildPostNav(post)}
-      </article>
-    `;
-
-    // 生成目录（TOC）
-    buildTOC(el);
-
-    // 代码高亮
-    el.querySelectorAll('pre code').forEach(b => {
-      try { hljs.highlightElement(b); } catch (e) {}
-    });
+      <div class="ri-page-head">
+        <div class="ri-page-en">${esc(dateSplit(meta.date || ''))}</div>
+        <h1 class="ri-page-title">${esc(meta.title || file)}</h1>
+        ${(meta.tags || []).length ? `<div class="ri-page-meta">${meta.tags.map(t => `<span class="ri-tag">${esc(t)}</span>`).join(' ')}</div>` : ''}
+      </div>
+      <div class="ri-article" id="riArticle">${html}</div>
+      <div style="margin-top:28px"><a class="ri-more" href="#/blog">← BACK // 返回情报列表</a></div>`;
+    if (typeof hljs !== 'undefined') {
+      el.querySelectorAll('pre code').forEach(b => { try { hljs.highlightElement(b); } catch (e) {} });
+    }
   } catch (e) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-icon">😢</div>文章加载失败</div>';
+    el.innerHTML = `<div class="ri-empty">ARCHIVE ERROR // 档案读取失败（${esc(e.message)}）</div>`;
   }
 }
 
-// ---------- 上一篇/下一篇文章导航 ----------
-function buildPostNav(currentPost) {
-  // 在 POSTS 数组中找到当前文章的位置
-  const idx = POSTS.findIndex(p => p.file === currentPost.file);
-  if (idx === -1) return '';
-
-  // POSTS 按日期倒序排列，idx-1 是下一篇（更新的），idx+1 是上一篇（更旧的）
-  const prevPost = idx < POSTS.length - 1 ? POSTS[idx + 1] : null; // 上一篇（更旧的文章）
-  const nextPost = idx > 0 ? POSTS[idx - 1] : null; // 下一篇（更新的文章）
-
-  return `
-    <nav class="post-nav">
-      <div class="post-nav-item post-nav-prev">
-        ${prevPost
-          ? `<a href="#/post/${encodeURIComponent(prevPost.file)}" class="post-nav-link">
-              <span class="post-nav-label">← 上一篇</span>
-              <span class="post-nav-title">${prevPost.title}</span>
-            </a>`
-          : `<span class="post-nav-link post-nav-disabled">
-              <span class="post-nav-label">← 上一篇</span>
-              <span class="post-nav-title">已是第一篇</span>
-            </span>`
-        }
-      </div>
-      <div class="post-nav-item post-nav-next">
-        ${nextPost
-          ? `<a href="#/post/${encodeURIComponent(nextPost.file)}" class="post-nav-link">
-              <span class="post-nav-label">下一篇 →</span>
-              <span class="post-nav-title">${nextPost.title}</span>
-            </a>`
-          : `<span class="post-nav-link post-nav-disabled">
-              <span class="post-nav-label">下一篇 →</span>
-              <span class="post-nav-title">已是最后一篇</span>
-            </span>`
-        }
-      </div>
-    </nav>
-  `;
-}
-
-// ---------- 文章目录（TOC）生成 ----------
-function buildTOC(el) {
-  const postBody = el.querySelector('.post-body');
-  if (!postBody) return;
-
-  // 提取所有 h2 和 h3 标题
-  const headings = postBody.querySelectorAll('h2, h3');
-  if (headings.length === 0) return;
-
-  const tocItems = [];
-
-  headings.forEach((h, i) => {
-    // 自动生成 id（锚点跳转用）
-    const id = 'heading-' + i + '-' + (h.textContent || '').replace(/[^a-zA-Z0-9\u4e00-\u9fff]+/g, '-').replace(/^-|-$/g, '');
-    h.id = id;
-
-    tocItems.push({
-      level: h.tagName.toLowerCase(),
-      text: h.textContent,
-      id: id
-    });
-  });
-
-  // 构建 TOC HTML
-  const tocHTML = `
-    <details class="toc-container" open>
-      <summary class="toc-title">目录</summary>
-      <nav class="toc-list">
-        ${tocItems.map(item => `
-          <a href="#${item.id}" class="toc-item toc-${item.level}" data-toc-target="${item.id}">
-            ${item.text}
-          </a>
-        `).join('')}
-      </nav>
-    </details>
-  `;
-
-  const placeholder = el.querySelector('#toc-placeholder');
-  if (placeholder) {
-    placeholder.innerHTML = tocHTML;
-
-    // 点击 TOC 项平滑滚动到对应标题
-    placeholder.querySelectorAll('.toc-item').forEach(link => {
-      link.addEventListener('click', function(e) {
-        e.preventDefault();
-        const target = document.getElementById(this.getAttribute('data-toc-target'));
-        if (target) {
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      });
-    });
-  }
-}
-
-// ---------- 事件绑定 ----------
+// ---------- 事件 ----------
 function bindEvents() {
-  // 主题切换
-  document.getElementById('themeBtn').addEventListener('click', () => {
-    CURRENT_THEME = CURRENT_THEME === 'light' ? 'dark' : 'light';
+  const themeBtn = $('themeBtn');
+  if (themeBtn) themeBtn.onclick = () => {
+    CURRENT_THEME = CURRENT_THEME === 'dark' ? 'light' : 'dark';
     applyTheme();
-  });
+  };
 
-  // 移动端菜单
-  document.getElementById('navToggle').addEventListener('click', () => {
-    document.getElementById('navLinks').classList.toggle('open');
-  });
+  const searchBtn = $('searchBtn');
+  const modal = $('searchModal');
+  const input = $('searchInput');
+  const results = $('searchResults');
+  if (searchBtn && modal) {
+    searchBtn.onclick = () => {
+      modal.classList.add('active');
+      setTimeout(() => input && input.focus(), 60);
+    };
+  }
+  const closeBtn = $('searchClose');
+  if (closeBtn) closeBtn.onclick = () => modal.classList.remove('active');
+  if (modal) modal.onclick = e => { if (e.target === modal) modal.classList.remove('active'); };
 
-  // 路由
-  window.addEventListener('hashchange', router);
-
-  // 搜索
-  const searchModal = document.getElementById('searchModal');
-  const searchInput = document.getElementById('searchInput');
-  document.getElementById('searchBtn').addEventListener('click', () => {
-    searchModal.classList.add('active');
-    setTimeout(() => searchInput.focus(), 100);
-  });
-  document.getElementById('searchClose').addEventListener('click', () => {
-    searchModal.classList.remove('active');
-  });
-  searchModal.addEventListener('click', (e) => {
-    if (e.target === searchModal) searchModal.classList.remove('active');
-  });
-  document.addEventListener('keydown', (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-      e.preventDefault();
-      searchModal.classList.add('active');
-      setTimeout(() => searchInput.focus(), 100);
-    }
-    if (e.key === 'Escape') searchModal.classList.remove('active');
-  });
-  searchInput.addEventListener('input', (e) => {
-    const q = e.target.value.toLowerCase().trim();
-    const results = document.getElementById('searchResults');
-    if (!q) {
-      results.innerHTML = '';
-      return;
-    }
-    const matched = POSTS.filter(p =>
-      p.title.toLowerCase().includes(q) ||
+  const doSearch = () => {
+    if (!input || !results) return;
+    const q = input.value.trim().toLowerCase();
+    if (!q) { results.innerHTML = ''; return; }
+    const hit = POSTS.filter(p =>
+      (p.title || '').toLowerCase().includes(q) ||
       (p.excerpt || '').toLowerCase().includes(q) ||
       (p.tags || []).some(t => t.toLowerCase().includes(q))
     );
-    if (matched.length === 0) {
-      results.innerHTML = '<div class="search-result"><div class="excerpt">未找到相关文章</div></div>';
-      return;
-    }
-    results.innerHTML = matched.map(p => `
-      <div class="search-result" onclick="location.hash='#/post/${encodeURIComponent(p.file)}';document.getElementById('searchModal').classList.remove('active')">
-        <div class="title">${p.title}</div>
-        <div class="excerpt">${(p.excerpt || '').slice(0, 80)} · ${p.date}</div>
-      </div>
-    `).join('');
-  });
+    results.innerHTML = hit.length
+      ? hit.map(p => `
+        <div class="ri-sr" onclick="location.hash='#/post/${encodeURIComponent(p.file || p.slug)}';document.getElementById('searchModal').classList.remove('active')">
+          <div class="ri-sr-t">${esc(p.title)}</div>
+          <div class="ri-sr-e">${esc(dateSplit(p.date))} · ${esc((p.tags || []).join(' / '))}</div>
+        </div>`).join('')
+      : '<div class="ri-empty">NO MATCH // 未找到相关档案</div>';
+  };
+  if (input) {
+    input.oninput = doSearch;
+    input.onkeydown = e => { if (e.key === 'Escape') modal.classList.remove('active'); };
+  }
+
+  // 移动端菜单
+  const menuBtn = $('menuBtn');
+  const rail = $('riRail');
+  if (menuBtn && rail) {
+    menuBtn.onclick = () => rail.classList.toggle('open');
+    document.addEventListener('click', e => {
+      if (rail.classList.contains('open') && !rail.contains(e.target) && e.target !== menuBtn) {
+        rail.classList.remove('open');
+      }
+    });
+  }
+
+  // 页脚向下箭头
+  const sd = $('riScrollDown');
+  if (sd) sd.onclick = () => window.scrollBy({ top: window.innerHeight * 0.7, behavior: 'smooth' });
 
   // 回到顶部
-  const backToTop = document.getElementById('backToTop');
-  window.addEventListener('scroll', () => {
-    backToTop.classList.toggle('visible', window.scrollY > 400);
-  });
-  backToTop.addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
+  const top = $('backToTop');
+  if (top) {
+    window.addEventListener('scroll', () => top.classList.toggle('visible', window.scrollY > 400));
+    top.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  window.addEventListener('hashchange', router);
 }
 
-/* ---------- 进站加载屏（仿官网 LOADING 界面）---------- */
+// ---------- 加载屏 ----------
 (function riLoader() {
-  const loader = document.getElementById('ri-loader');
-  const pct = document.getElementById('ri-pct');
-  const bar = document.getElementById('ri-bar');
-  const dots = document.getElementById('ri-dots');
+  const loader = $('ri-loader'), pct = $('ri-pct'), bar = $('ri-bar'), dots = $('ri-dots');
   if (!loader || !pct) return;
-  let p = 0, dotN = 0;
-  const dotTick = setInterval(() => {
-    dotN = (dotN % 7) + 1;
-    if (dots) dots.textContent = '.'.repeat(dotN).padEnd(7, ' ');
-  }, 160);
-  const tick = setInterval(() => {
-    p += Math.random() * 16 + 7;
+  let p = 0, n = 0;
+  const dt = setInterval(() => { n = (n % 7) + 1; if (dots) dots.textContent = '.'.repeat(n).padEnd(7, ' '); }, 160);
+  const t = setInterval(() => {
+    p += Math.random() * 17 + 7;
     if (p >= 100) {
-      p = 100;
-      clearInterval(tick);
-      setTimeout(() => {
-        clearInterval(dotTick);
-        loader.classList.add('done');
-        setTimeout(() => loader.remove(), 750);
-      }, 420);
+      p = 100; clearInterval(t);
+      setTimeout(() => { clearInterval(dt); loader.classList.add('done'); setTimeout(() => loader.remove(), 750); }, 400);
     }
     pct.textContent = Math.floor(p);
     if (bar) bar.style.width = p + '%';
   }, 105);
 })();
 
-/* ---------- 启动 ---------- */
-init();
+// ---------- 启动 ----------
+(async function init() {
+  applyTheme();
+  await loadPosts();
+  bindEvents();
+  renderRail();
+  startClock();
+  startParticles();
+  router();
+})();
