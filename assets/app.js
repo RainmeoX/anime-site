@@ -157,6 +157,8 @@ function router() {
   const r = ROUTES[base] || ROUTES['/'];
   const pn = $('riPageName'); if (pn) pn.textContent = r.page;
   const wm = $('riWatermark'); if (wm) wm.textContent = r.en === 'INDEX' ? 'RAINMEOX' : r.en;
+  // 首页标记：首页有大屏立绘，隐藏右侧固定装饰
+  document.body.classList.toggle('ri-home', base === '/');
 
   main.innerHTML = '';
   if (hash === '/') renderHome(main);
@@ -197,29 +199,204 @@ function itemHTML(p) {
     </a>`;
 }
 
-// ---------- 首页 ----------
+// ---------- 首页（仿官网 7 区结构）----------
+const HOME_TOTAL = '07';
+
 function renderHome(el) {
-  const recent = POSTS.slice(0, 6);
+  const latest = POSTS[0];
+  const cats = ['最新', ...new Set(POSTS.map(p => p.category).filter(Boolean))];
+  const feats = PROJECTS.slice(0, 4);
   el.innerHTML = `
-    ${pageHead('INDEX', '罗德岛终端', `${esc(PROFILE.bio)}<br>用代码点亮喜欢的角色。这里存放我的情报、项目与实验记录。`,
-      `<span>STATUS <b>ONLINE</b></span><span>LOCATION <b>${esc(PROFILE.location)}</b></span><span>POSTS <b>${POSTS.length}</b></span><span>PROJECTS <b>${PROJECTS.length}</b></span>`)}
+    <!-- 01 HERO 大屏 -->
+    <section class="ri-hero" data-code="01" data-name="HERO">
+      <div class="ri-hero-bgtext" aria-hidden="true">RHODES<br>ISLAND</div>
+      <div class="ri-hero-art" aria-hidden="true"></div>
+      <div class="ri-hero-body">
+        <div class="ri-hero-tag">PRTS TERMINAL // PERSONAL ARCHIVE</div>
+        <h1 class="ri-hero-title">RAINMEOX</h1>
+        <div class="ri-hero-sub">罗德岛终端 <span>// RHODES ISLAND OPERATOR LOG</span></div>
+        <p class="ri-hero-desc">${esc(PROFILE.bio)}<br>用代码点亮喜欢的角色，这里存放我的情报、项目与实验记录。</p>
+        <div class="ri-hero-btns">
+          <a class="ri-btn ri-btn-solid" href="#/blog">READ MORE <i>查看情报</i></a>
+          <a class="ri-btn ri-btn-ghost" href="#/projects">OPERATOR <i>项目档案</i></a>
+        </div>
+        <div class="ri-hero-meta">
+          <span>STATUS <b>ONLINE</b></span><span>LOCATION <b>${esc(PROFILE.location)}</b></span>
+          <span>POSTS <b>${POSTS.length}</b></span><span>PROJECTS <b>${PROJECTS.length}</b></span>
+        </div>
+      </div>
+      <div class="ri-hero-side">
+        <div class="ri-hero-follow">关<br>注<br>频<br>道</div>
+        <div class="ri-hero-social">
+          <a href="${esc(PROFILE.github)}" target="_blank" rel="noopener" title="GitHub">GH</a>
+          <a href="${esc(PROFILE.csdn)}" target="_blank" rel="noopener" title="CSDN">CS</a>
+          <a href="${esc(PROFILE.elecfans)}" target="_blank" rel="noopener" title="电子发烧友">EF</a>
+          <a href="${esc(PROFILE.mail)}" title="Mail">@</a>
+        </div>
+      </div>
+    </section>
 
-    <div class="ri-sec-title">TERMINOLOGY // 关键词</div>
-    <div class="ri-terms">
-      ${PROFILE.interests.map((t, i) => `
-        <div class="ri-term">
-          <div class="ri-term-en">TERM-${String(i + 1).padStart(2, '0')}</div>
-          <div class="ri-term-cn">${esc(t)}</div>
-        </div>`).join('')}
-    </div>
+    <!-- 02 BREAKING NEWS 跑马条 -->
+    ${latest ? `
+    <section class="ri-breaking" data-code="02" data-name="BREAKING NEWS">
+      <div class="ri-breaking-label"><i></i>BREAKING NEWS</div>
+      <a class="ri-breaking-link" href="#/post/${encodeURIComponent(latest.file || '')}">
+        <span class="ri-breaking-title">${esc(latest.title)}</span>
+        <span class="ri-breaking-date">${esc(dateSplit(latest.date))}</span>
+      </a>
+      <a class="ri-breaking-more" href="#/blog">更多情报 <b>READ MORE</b></a>
+    </section>` : ''}
 
-    <div class="ri-sec-title">LATEST INTELLIGENCE // 最新情报</div>
-    <div class="ri-list">
-      <div class="ri-list-head"><span>DATE</span><span>ARCHIVE</span></div>
-      ${recent.length ? recent.map(itemHTML).join('') : '<div class="ri-empty">NO RECORDS // 暂无记录</div>'}
-    </div>
-    <div style="margin-top:18px"><a class="ri-more" href="#/blog">READ MORE // 查看全部 →</a></div>
+    <!-- 03 情报（带标签页）-->
+    <section class="ri-sec" data-code="03" data-name="INFORMATION">
+      <div class="ri-sec-head">
+        <span class="ri-sec-no">03</span>
+        <div class="ri-sec-h"><h2>情报</h2><i>INFORMATION</i></div>
+        <a class="ri-sec-more" href="#/blog">READ MORE +</a>
+      </div>
+      <div class="ri-tabs" id="riTabs">
+        ${cats.map((c, i) => `<button class="ri-tab${i === 0 ? ' active' : ''}" data-cat="${esc(c)}">${esc(c)}</button>`).join('')}
+      </div>
+      <div class="ri-list" id="riTabList">
+        <div class="ri-list-head"><span>DATE</span><span>ARCHIVE</span></div>
+        ${POSTS.slice(0, 5).map(itemHTML).join('') || '<div class="ri-empty">NO RECORDS // 暂无记录</div>'}
+      </div>
+    </section>
+
+    <!-- 04 干员档案（可切换）-->
+    <section class="ri-sec" data-code="04" data-name="PROFILE">
+      <div class="ri-sec-head">
+        <span class="ri-sec-no">04</span>
+        <div class="ri-sec-h"><h2>档案</h2><i>RHODES ISLAND :// PROFILE</i></div>
+        <a class="ri-sec-more" href="#/about">READ MORE +</a>
+      </div>
+      <div class="ri-op">
+        <div class="ri-op-visual">
+          <div class="ri-op-avatar" style="background-image:url('${esc(PROFILE.avatar)}')"></div>
+          <div class="ri-op-code" id="riOpCode">RL-00</div>
+        </div>
+        <div class="ri-op-info">
+          <div class="ri-op-en" id="riOpEn">RAINMEOX</div>
+          <div class="ri-op-cn" id="riOpCn">${esc(PROFILE.role)}</div>
+          <div class="ri-op-voice" id="riOpVoice">SKILL STACK <b>${PROFILE.skills.length}</b></div>
+          <p class="ri-op-bio" id="riOpBio">${esc(PROFILE.bio)}。常驻${esc(PROFILE.location)}，长期活跃于开源社区与硬件开发一线。</p>
+          <div class="ri-op-tags" id="riOpTags">${PROFILE.skills.slice(0, 8).map(s => `<span>${esc(s)}</span>`).join('')}</div>
+        </div>
+        <div class="ri-op-list" id="riOpList">
+          <button class="ri-op-item active" data-i="-1">RAINMEOX<span>TERMINAL ADMIN</span></button>
+          ${feats.map((p, i) => `<button class="ri-op-item" data-i="${i}">${esc(p.name)}<span>${esc(p.lang)}</span></button>`).join('')}
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 术语（泰拉万象）-->
+    <section class="ri-sec" data-code="05" data-name="WORLD">
+      <div class="ri-sec-head">
+        <span class="ri-sec-no">05</span>
+        <div class="ri-sec-h"><h2>泰拉万象</h2><i>ABOUT TERRA</i></div>
+      </div>
+      <div class="ri-terms">
+        ${PROFILE.interests.map((t, i) => `
+          <div class="ri-term">
+            <div class="ri-term-en">TERM-${String(i + 1).padStart(2, '0')}</div>
+            <div class="ri-term-cn">${esc(t)}</div>
+          </div>`).join('')}
+      </div>
+    </section>
+
+    <!-- 06 更多内容 -->
+    <section class="ri-sec" data-code="06" data-name="MORE CONTENT">
+      <div class="ri-sec-head">
+        <span class="ri-sec-no">06</span>
+        <div class="ri-sec-h"><h2>更多内容</h2><i>MORE CONTENT</i></div>
+      </div>
+      <div class="ri-more-grid">
+        <a class="ri-more-card" href="#/blog"><b>情报档案</b><i>INFORMATION ARCHIVE</i><em>VIEW MORE &gt;</em></a>
+        <a class="ri-more-card" href="#/projects"><b>项目工坊</b><i>WORKSHOP / OPERATOR</i><em>VIEW MORE &gt;</em></a>
+        <a class="ri-more-card" href="#/tags"><b>标签图鉴</b><i>INDEX / WORLD</i><em>VIEW MORE &gt;</em></a>
+        <a class="ri-more-card" href="#/about"><b>关于我</b><i>PROFILE / MEDIA</i><em>VIEW MORE &gt;</em></a>
+      </div>
+    </section>
+
+    <!-- 07 外部频道 -->
+    <section class="ri-sec" data-code="07" data-name="MEDIA">
+      <div class="ri-sec-head">
+        <span class="ri-sec-no">07</span>
+        <div class="ri-sec-h"><h2>外部频道</h2><i>MEDIA</i></div>
+      </div>
+      <div class="ri-media-rows">
+        <a href="${esc(PROFILE.github)}" target="_blank" rel="noopener"><span class="ri-media-en">GITHUB</span><span class="ri-media-cn">代码仓库 · 开源项目</span><em>→</em></a>
+        <a href="${esc(PROFILE.csdn)}" target="_blank" rel="noopener"><span class="ri-media-en">CSDN</span><span class="ri-media-cn">技术博客 · 文章首发</span><em>→</em></a>
+        <a href="${esc(PROFILE.elecfans)}" target="_blank" rel="noopener"><span class="ri-media-en">ELECFANS</span><span class="ri-media-cn">电子发烧友 · 硬件社区</span><em>→</em></a>
+        <a href="${esc(PROFILE.mail)}"><span class="ri-media-en">MAIL</span><span class="ri-media-cn">2692738315@qq.com · 联络信道</span><em>→</em></a>
+      </div>
+    </section>
   `;
+  bindHomeEvents(el);
+}
+
+// 首页交互：情报标签页 + 档案切换
+function bindHomeEvents(el) {
+  const tabs = el.querySelectorAll('.ri-tab');
+  const list = el.querySelector('#riTabList');
+  if (tabs.length && list) {
+    tabs.forEach(btn => btn.onclick = () => {
+      tabs.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const cat = btn.dataset.cat;
+      const rows = (cat === '最新' ? POSTS.slice(0, 5) : POSTS.filter(p => p.category === cat).slice(0, 5));
+      list.innerHTML = `<div class="ri-list-head"><span>DATE</span><span>ARCHIVE</span></div>` +
+        (rows.length ? rows.map(itemHTML).join('') : '<div class="ri-empty">NO RECORDS // 暂无记录</div>');
+      setTimeout(initReveal, 30);
+    });
+  }
+
+  const opItems = el.querySelectorAll('.ri-op-item');
+  if (opItems.length) {
+    const show = i => {
+      if (i < 0) {
+        $('riOpCode').textContent = 'RL-00';
+        $('riOpEn').textContent = 'RAINMEOX';
+        $('riOpCn').textContent = PROFILE.role;
+        $('riOpVoice').innerHTML = `SKILL STACK <b>${PROFILE.skills.length}</b>`;
+        $('riOpBio').textContent = `${PROFILE.bio}。常驻${PROFILE.location}，长期活跃于开源社区与硬件开发一线。`;
+        $('riOpTags').innerHTML = PROFILE.skills.slice(0, 8).map(s => `<span>${esc(s)}</span>`).join('');
+      } else {
+        const p = PROJECTS.slice(0, 4)[i];
+        if (!p) return;
+        $('riOpCode').textContent = 'RL-' + String(i + 1).padStart(2, '0');
+        $('riOpEn').textContent = p.name.toUpperCase();
+        $('riOpCn').textContent = 'PROJECT // ' + p.lang;
+        $('riOpVoice').innerHTML = `STARS <b>${p.stars || 0}</b>`;
+        $('riOpBio').textContent = p.desc;
+        $('riOpTags').innerHTML = `<span>${esc(p.lang)}</span><span>OPEN SOURCE</span><span>GITHUB</span>`;
+      }
+    };
+    opItems.forEach(btn => btn.onclick = () => {
+      opItems.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      show(parseInt(btn.dataset.i, 10));
+    });
+  }
+}
+
+// 首页分区计数（仿官网 00 // 00 / 05）
+function initSectionCounter() {
+  const el = $('riSecCode');
+  if (!el) return;
+  const isHome = () => (location.hash.slice(1) || '/') === '/';
+  const update = () => {
+    if (!isHome()) { el.textContent = ''; return; }
+    const secs = [...document.querySelectorAll('#mainContent [data-code]')];
+    let cur = secs[0];
+    for (const s of secs) {
+      if (s.getBoundingClientRect().top <= window.innerHeight * 0.5) cur = s;
+    }
+    if (cur) el.textContent = `${cur.dataset.code} // ${cur.dataset.code} / ${HOME_TOTAL}  ${cur.dataset.name || ''}`;
+  };
+  window.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('hashchange', () => setTimeout(update, 60));
+  update();
 }
 
 // ---------- 情报页 ----------
@@ -527,4 +704,5 @@ function initScrollDown() {
   initSwitch();
   initScrollHint();
   initScrollDown();
+  initSectionCounter();
 })();
