@@ -167,6 +167,7 @@ function router() {
   else if (hash.startsWith('/post/')) renderPost(main, decodeURIComponent(hash.slice(6)));
   else renderHome(main);
   window.scrollTo(0, 0);
+  setTimeout(initReveal, 30);
 }
 
 // ---------- 页头 ----------
@@ -408,6 +409,106 @@ function bindEvents() {
   }, 105);
 })();
 
+
+/* ============================================================
+   v5.1 交互增强：滚动揭示 / 视差 / 涟漪 / 转场 / 左右切换
+   ============================================================ */
+const NAV_ORDER = ['/', '/blog', '/projects', '/tags', '/about'];
+
+function initReveal() {
+  const els = document.querySelectorAll('.ri-item, .ri-card, .ri-term, .ri-sec-title, .ri-page-head, .ri-list-head');
+  if (!('IntersectionObserver' in window)) { els.forEach(e => e.classList.add('in')); return; }
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
+  }, { threshold: .1, rootMargin: '0px 0px -36px 0px' });
+  els.forEach((el, i) => {
+    el.classList.add('ri-reveal');
+    el.style.transitionDelay = (Math.min(i % 9, 8) * 0.04) + 's';
+    io.observe(el);
+  });
+}
+
+function initScrollFx() {
+  const wm = document.getElementById('riWatermark');
+  const pg = document.getElementById('ri-progress');
+  const onScroll = () => {
+    const y = window.scrollY || 0;
+    if (wm) wm.style.transform = 'translateY(' + (-y * 0.07) + 'px)';
+    if (pg) {
+      const h = document.documentElement.scrollHeight - window.innerHeight;
+      pg.style.width = (h > 0 ? Math.min(100, (y / h) * 100) : 0) + '%';
+    }
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+}
+
+function initRipple() {
+  document.addEventListener('click', e => {
+    const t = e.target.closest('.ri-item, .ri-card, .ri-btn, .ri-nav-item, .ri-rail-link, .ri-term');
+    if (!t) return;
+    const r = t.getBoundingClientRect();
+    const size = Math.max(r.width, r.height);
+    const s = document.createElement('span');
+    s.className = 'ri-ripple';
+    s.style.width = s.style.height = size + 'px';
+    s.style.left = (e.clientX - r.left - size / 2) + 'px';
+    s.style.top = (e.clientY - r.top - size / 2) + 'px';
+    t.appendChild(s);
+    setTimeout(() => s.remove(), 640);
+  });
+}
+
+function gotoRoute(path, animate) {
+  const tr = document.getElementById('riTransition');
+  if (animate && tr) { tr.classList.add('run'); setTimeout(() => tr.classList.remove('run'), 540); }
+  if (location.hash === '#' + path) { router(); setTimeout(initReveal, 30); return; }
+  location.hash = '#' + path;
+}
+
+function initSwitch() {
+  const prev = document.getElementById('riPrev');
+  const next = document.getElementById('riNext');
+  const cur = () => {
+    const h = location.hash.slice(1) || '/';
+    return h.startsWith('/post/') ? '/blog' : h;
+  };
+  const update = () => {
+    const i = NAV_ORDER.indexOf(cur());
+    if (prev) prev.disabled = i <= 0;
+    if (next) next.disabled = i >= NAV_ORDER.length - 1;
+  };
+  if (prev) prev.onclick = () => { const i = NAV_ORDER.indexOf(cur()); if (i > 0) gotoRoute(NAV_ORDER[i - 1], true); };
+  if (next) next.onclick = () => { const i = NAV_ORDER.indexOf(cur()); if (i < NAV_ORDER.length - 1) gotoRoute(NAV_ORDER[i + 1], true); };
+  document.addEventListener('keydown', e => {
+    const tag = (e.target.tagName || '').toUpperCase();
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+    const i = NAV_ORDER.indexOf(cur());
+    if (e.key === 'ArrowRight' && i < NAV_ORDER.length - 1) { e.preventDefault(); gotoRoute(NAV_ORDER[i + 1], true); }
+    if (e.key === 'ArrowLeft' && i > 0) { e.preventDefault(); gotoRoute(NAV_ORDER[i - 1], true); }
+    if (e.key === '/') { e.preventDefault(); const sb = document.getElementById('searchBtn'); if (sb) sb.click(); }
+  });
+  window.addEventListener('hashchange', () => setTimeout(update, 20));
+  setTimeout(update, 60);
+}
+
+function initScrollHint() {
+  const hint = document.getElementById('riScrollHint');
+  if (!hint) return;
+  const toggle = () => { hint.style.display = ((location.hash.slice(1) || '/') === '/') ? 'flex' : 'none'; };
+  window.addEventListener('hashchange', toggle);
+  toggle();
+}
+
+// 页脚「向下滚动」箭头 + 滚动提示点击
+function initScrollDown() {
+  const go = () => window.scrollBy({ top: window.innerHeight * 0.72, behavior: 'smooth' });
+  const sd = document.getElementById('riScrollDown');
+  const hint = document.getElementById('riScrollHint');
+  if (sd) sd.onclick = e => { e.preventDefault(); go(); };
+  if (hint) hint.onclick = go;
+}
+
 // ---------- 启动 ----------
 (async function init() {
   applyTheme();
@@ -417,4 +518,10 @@ function bindEvents() {
   startClock();
   startParticles();
   router();
+  initReveal();
+  initScrollFx();
+  initRipple();
+  initSwitch();
+  initScrollHint();
+  initScrollDown();
 })();

@@ -454,3 +454,40 @@ body::before {
   .ri-item { grid-template-columns: 66px 1fr; }
   .ri-item-tags { grid-column: 2; justify-content: flex-start; margin-top: 5px; }
 }
+
+
+/* ============================================================
+   v5.1 交互增强：滚动 / 左右切换 / 点击反馈 / 转场 / 官方素材
+   ============================================================ */
+.ri-reveal { opacity: 0; transform: translateY(24px); transition: opacity .65s var(--ease), transform .65s var(--ease); }
+.ri-reveal.in { opacity: 1; transform: none; }
+
+.ri-item, .ri-card, .ri-btn, .ri-nav-item, .ri-rail-link, .ri-term { position: relative; overflow: hidden; }
+.ri-ripple { position: absolute; border-radius: 50%; background: rgba(24,209,255,.34); transform: scale(0); animation: ri-ripple .62s var(--ease) forwards; pointer-events: none; z-index: 6; }
+@keyframes ri-ripple { to { transform: scale(4.5); opacity: 0; } }
+.ri-item:active, .ri-card:active, .ri-term:active { transform: scale(.986); }
+
+#ri-transition { position: fixed; inset: 0; z-index: 100000; pointer-events: none; display: none; }
+#ri-transition::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, var(--ak-blue), #0a7ba8); transform: translateX(-101%); }
+#ri-transition.run { display: block; }
+#ri-transition.run::before { animation: ri-sweep .52s var(--ease); }
+@keyframes ri-sweep { 0% { transform: translateX(-101%); } 45% { transform: translateX(0); } 100% { transform: translateX(101%); } }
+
+#ri-progress { position: fixed; top: 0; left: 0; height: 2px; width: 0; z-index: 10001; background: var(--ak-blue); box-shadow: 0 0 10px var(--ak-blue-glow); }
+
+.ri-switch { display: inline-flex; gap: 6px; align-items: center; }
+.ri-switch button { width: 30px; height: 30px; border: 1px solid var(--border-light); background: transparent; color: var(--text-secondary); border-radius: 2px; font-size: 11px; transition: all .3s ease; }
+.ri-switch button:hover { border-color: var(--ak-blue); color: var(--ak-blue); box-shadow: 0 0 12px var(--ak-blue-dim); }
+.ri-switch button:disabled { opacity: .3; cursor: not-allowed; }
+
+.ri-char-deco { position: fixed; right: calc(var(--rail-w) + 10px); bottom: 118px; height: 46vh; max-height: 460px; width: 260px; opacity: .07; pointer-events: none; z-index: 1; background: url('images/char_kaltsit.png') bottom right/contain no-repeat; transition: opacity .4s ease; }
+[data-theme="dark"] .ri-char-deco { opacity: .12; }
+@media (max-width: 1180px) { .ri-char-deco { display: none; } }
+
+.ri-dots-strip { height: 9px; background: url('textures/dots_wide.png') repeat-x center/auto 9px; opacity: .3; margin: 20px 0; }
+
+.ri-scroll-hint { position: fixed; left: 26px; bottom: 130px; z-index: 800; display: flex; flex-direction: column; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 9px; letter-spacing: .22em; color: var(--muted); animation: ri-hint 2.4s ease-in-out infinite; cursor: pointer; transition: color .3s ease; }
+.ri-scroll-hint:hover { color: var(--ak-blue); }
+@keyframes ri-hint { 0%,100% { transform: translateY(0); } 50% { transform: translateY(7px); } }
+
+.ri-kbd { font-family: var(--font-mono); font-size: 9px; padding: 1px 5px; border: 1px solid var(--border-light); border-radius: 2px; color: var(--muted); }
