@@ -501,7 +501,7 @@ body::before {
 /* ---------- 01 HERO ---------- */
 .ri-hero { position: relative; min-height: 68vh; display: flex; align-items: center; gap: 30px; padding: 46px 8px 34px; overflow: hidden; }
 .ri-hero-bgtext { position: absolute; right: -1%; top: 2%; font-family: var(--font-display); font-weight: 900; font-size: clamp(90px, 13vw, 180px); line-height: .88; letter-spacing: .02em; color: transparent; -webkit-text-stroke: 1px var(--border); opacity: .55; user-select: none; pointer-events: none; white-space: nowrap; }
-.ri-hero-art { position: absolute; right: 4%; bottom: 0; width: min(400px, 32vw); height: 88%; background: url('images/char_amiya.png') bottom center/contain no-repeat; opacity: .5; pointer-events: none; filter: drop-shadow(0 12px 30px rgba(0,0,0,.16)); }
+.ri-hero-art { position: absolute; right: 4%; bottom: 0; width: min(400px, 32vw); height: 88%; background: url('images/char_jessica.png') bottom center/contain no-repeat; opacity: .5; pointer-events: none; filter: drop-shadow(0 12px 30px rgba(0,0,0,.16)); }
 [data-theme="dark"] .ri-hero-art { opacity: .68; }
 .ri-hero-body { position: relative; z-index: 2; max-width: 660px; }
 .ri-hero-tag { display: inline-block; font-family: var(--font-mono); font-size: 10px; letter-spacing: .3em; color: var(--ak-blue); border: 1px solid var(--border); padding: 5px 14px; background: linear-gradient(90deg, var(--ak-blue-dim), transparent); }
