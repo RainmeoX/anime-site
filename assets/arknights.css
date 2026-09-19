@@ -642,6 +642,20 @@ body.ri-home .ri-char-deco { display: none; }
 /* ---------- 装饰层容器 ---------- */
 .ri-hero-deco { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
 
+/* ---------- 上下/左右转场（两层嵌套渐隐，遮罩作用于整棵子树）----------
+   为什么用嵌套而不是 mask-composite：一层只写一个渐变，兼容性最好。
+   wash = 上下转场；wash-x = 左右转场；刻度尺/坐标注记留在外层不受影响。 */
+.ri-hero-wash,
+.ri-hero-wash-x { position: absolute; inset: 0; pointer-events: none; }
+.ri-hero-wash {
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 13%, #000 84%, transparent 100%);
+          mask-image: linear-gradient(180deg, transparent 0%, #000 13%, #000 84%, transparent 100%);
+}
+.ri-hero-wash-x {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 9%, #000 91%, transparent 100%);
+          mask-image: linear-gradient(90deg, transparent 0%, #000 9%, #000 91%, transparent 100%);
+}
+
 /* ---------- 品牌色块主块（官网 mask_block，右对齐置人物背后）---------- */
 .ri-hero-plate {
   position: absolute; right: 0; bottom: 0;

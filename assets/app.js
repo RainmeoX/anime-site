@@ -212,9 +212,14 @@ function renderHome(el) {
       <div class="ri-hero-bgtext" aria-hidden="true">RHODES<br>ISLAND</div>
       <div class="ri-hero-art" aria-hidden="true"></div>
       <div class="ri-hero-deco" aria-hidden="true">
-        <div class="ri-hero-plate"></div>
-        <div class="ri-hero-plate ri-hero-plate-b"></div>
-        <div class="ri-hero-vignette"></div>
+        <!-- 两层嵌套渐隐：wash 管上下转场，wash-x 管左右转场；遮罩作用于整棵子树 -->
+        <div class="ri-hero-wash">
+          <div class="ri-hero-wash-x">
+            <div class="ri-hero-plate"></div>
+            <div class="ri-hero-plate ri-hero-plate-b"></div>
+            <div class="ri-hero-vignette"></div>
+          </div>
+        </div>
         <div class="ri-hero-scale"></div>
         <div class="ri-hero-coord">X:1180&nbsp; Y:0640&nbsp; //&nbsp; PRTS OPTICAL UNIT</div>
       </div>
