@@ -648,8 +648,9 @@ body.ri-home .ri-char-deco { display: none; }
 .ri-hero-wash,
 .ri-hero-wash-x { position: absolute; inset: 0; pointer-events: none; }
 .ri-hero-wash {
-  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 13%, #000 84%, transparent 100%);
-          mask-image: linear-gradient(180deg, transparent 0%, #000 13%, #000 84%, transparent 100%);
+  /* 顶部 22% 完全留白：顶栏正下方彻底不放装饰，避免半透明网点形成「灰雾带」 */
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, transparent 22%, #000 40%, #000 86%, transparent 100%);
+          mask-image: linear-gradient(180deg, transparent 0%, transparent 22%, #000 40%, #000 86%, transparent 100%);
 }
 .ri-hero-wash-x {
   -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 9%, #000 91%, transparent 100%);
