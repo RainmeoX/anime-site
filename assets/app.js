@@ -204,13 +204,15 @@ function renderHome(el) {
   const recent = POSTS.slice(0, 5);
   el.innerHTML = `
     <div class="hero">
-      <div class="hero-kicker">▍PRTS // TERMINAL ACCESS</div>
+      <div class="hero-kicker">PRTS // TERMINAL ACCESS</div>
       <h1>RHODES ISLAND</h1>
       <p class="hero-sub">RAINMEOX · 罗德岛终端</p>
       <p class="tagline">${PROFILE.bio}<br>用代码点亮喜欢的角色</p>
       <div class="hero-tags">
         ${PROFILE.interests.map(t => `<span class="hero-tag">${t}</span>`).join('')}
       </div>
+      <div class="ri-deco-diamond"></div>
+      <div class="ri-vertical" style="position:absolute;right:30px;top:74px">RHODES ISLAND</div>
     </div>
 
     <div class="section-header">
@@ -553,5 +555,33 @@ function bindEvents() {
   });
 }
 
-// ---------- 启动 ----------
+/* ---------- 进站加载屏（仿官网 LOADING 界面）---------- */
+(function riLoader() {
+  const loader = document.getElementById('ri-loader');
+  const pct = document.getElementById('ri-pct');
+  const bar = document.getElementById('ri-bar');
+  const dots = document.getElementById('ri-dots');
+  if (!loader || !pct) return;
+  let p = 0, dotN = 0;
+  const dotTick = setInterval(() => {
+    dotN = (dotN % 7) + 1;
+    if (dots) dots.textContent = '.'.repeat(dotN).padEnd(7, ' ');
+  }, 160);
+  const tick = setInterval(() => {
+    p += Math.random() * 16 + 7;
+    if (p >= 100) {
+      p = 100;
+      clearInterval(tick);
+      setTimeout(() => {
+        clearInterval(dotTick);
+        loader.classList.add('done');
+        setTimeout(() => loader.remove(), 750);
+      }, 420);
+    }
+    pct.textContent = Math.floor(p);
+    if (bar) bar.style.width = p + '%';
+  }, 105);
+})();
+
+/* ---------- 启动 ---------- */
 init();
