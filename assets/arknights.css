@@ -627,3 +627,86 @@ body.ri-home .ri-char-deco { display: none; }
   .ri-media-en { min-width: 96px; font-size: 15px; }
   .ri-sec-no { font-size: 24px; }
 }
+
+/* ============================================================
+   v5.6 HERO 铺底（对照官网多层叠加手法，素材与写法取自官网）
+   官网原版：mask_block 两块叠加 + common_mask 全屏网点 + 底边渐变 + 刻度尺
+   本站在官网基础上按自身版式调整：色块右移置人物背后、顶部渐变淡出、降透明度
+   ============================================================ */
+
+/* 层级：deco(1) → bgtext(1) → art(2) → 内容(3) */
+.ri-hero-bgtext { z-index: 1; }
+.ri-hero-art { z-index: 2; }
+.ri-hero-body, .ri-hero-side { z-index: 3; }
+
+/* ---------- 装饰层容器 ---------- */
+.ri-hero-deco { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+
+/* ---------- 品牌色块主块（官网 mask_block，右对齐置人物背后）---------- */
+.ri-hero-plate {
+  position: absolute; right: 0; bottom: 0;
+  width: 620px; height: 720px;
+  background: url('textures/mask_block.png?v=56') no-repeat 100% 62%;
+  background-size: auto 105%;
+  opacity: .22;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, transparent 30%, #000 80%);
+          mask-image: linear-gradient(180deg, transparent 0%, transparent 30%, #000 80%);
+}
+
+/* ---------- 品牌色块次块（官网第二块，本站做左侧一角虚影）---------- */
+.ri-hero-plate-b {
+  right: auto; left: -60px;
+  width: 300px; height: 420px;
+  background-position: 0 20%;
+  background-size: auto 90%;
+  opacity: .08;
+  -webkit-mask-image: linear-gradient(180deg, transparent 45%, #000 95%);
+          mask-image: linear-gradient(180deg, transparent 45%, #000 95%);
+}
+
+[data-theme="dark"] .ri-hero-plate { opacity: .28; }
+[data-theme="dark"] .ri-hero-plate-b { opacity: .10; }
+
+/* ---------- 网点蒙版（官网 common_mask 全屏覆盖，普通叠加，无混合模式）---------- */
+.ri-hero-vignette {
+  position: absolute; inset: 0;
+  background: url('textures/common_mask.png?v=56') no-repeat 100% 100%;
+  background-size: 100% 100%;
+  opacity: .13;
+}
+[data-theme="dark"] .ri-hero-vignette { opacity: .20; }
+
+/* ---------- 底部刻度尺（官网 dashed texture 同源手法）---------- */
+.ri-hero-scale {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 16px;
+  border-bottom: 1px solid var(--border-light);
+  background-image: repeating-linear-gradient(90deg, var(--faint) 0 1px, transparent 1px 28px);
+  opacity: .55;
+}
+
+/* ---------- 坐标注记 ---------- */
+.ri-hero-coord {
+  position: absolute; right: 4px; bottom: 22px;
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: .18em;
+  color: var(--muted); opacity: .8; white-space: nowrap;
+}
+
+/* ---------- 虚线纹理分隔（官网原写法 repeating-linear-gradient）---------- */
+.ri-hero-rule {
+  height: 1px; margin: 26px 0 0; max-width: 520px;
+  background-image: repeating-linear-gradient(90deg, var(--muted) 0 .25rem, transparent 0 .5rem);
+  opacity: .5;
+  animation: ri-rule-grow .9s var(--ease) both;
+}
+@keyframes ri-rule-grow { from { transform: scaleX(0); transform-origin: left; } to { transform: none; } }
+
+/* ---------- 响应式 ---------- */
+@media (max-width: 1100px) {
+  .ri-hero-plate { width: 460px; height: 560px; }
+  .ri-hero-plate-b { display: none; }
+  .ri-hero-coord { display: none; }
+}
+@media (max-width: 640px) {
+  .ri-hero-plate { width: 320px; height: 420px; opacity: .18; }
+  .ri-hero-vignette { opacity: .10; }
+}

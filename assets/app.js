@@ -211,6 +211,13 @@ function renderHome(el) {
     <section class="ri-hero" data-code="01" data-name="HERO">
       <div class="ri-hero-bgtext" aria-hidden="true">RHODES<br>ISLAND</div>
       <div class="ri-hero-art" aria-hidden="true"></div>
+      <div class="ri-hero-deco" aria-hidden="true">
+        <div class="ri-hero-plate"></div>
+        <div class="ri-hero-plate ri-hero-plate-b"></div>
+        <div class="ri-hero-vignette"></div>
+        <div class="ri-hero-scale"></div>
+        <div class="ri-hero-coord">X:1180&nbsp; Y:0640&nbsp; //&nbsp; PRTS OPTICAL UNIT</div>
+      </div>
       <div class="ri-hero-body">
         <div class="ri-hero-tag">PRTS TERMINAL // PERSONAL ARCHIVE</div>
         <h1 class="ri-hero-title">RAINMEOX</h1>
@@ -220,6 +227,7 @@ function renderHome(el) {
           <a class="ri-btn ri-btn-solid" href="#/blog">READ MORE <i>查看情报</i></a>
           <a class="ri-btn ri-btn-ghost" href="#/projects">OPERATOR <i>项目档案</i></a>
         </div>
+        <div class="ri-hero-rule"></div>
         <div class="ri-hero-meta">
           <span>STATUS <b>ONLINE</b></span><span>LOCATION <b>${esc(PROFILE.location)}</b></span>
           <span>POSTS <b>${POSTS.length}</b></span><span>PROJECTS <b>${PROJECTS.length}</b></span>
