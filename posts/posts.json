@@ -1,5 +1,75 @@
 [
   {
+    "title": "不租服务器不用 Notion：我把 1.6 万个文件和 147 段 AI 对话炼成本地图书馆「琥珀」",
+    "date": "2026-10-01",
+    "category": "效率工具",
+    "tags": [
+      "SQLite",
+      "FTS5",
+      "本地知识库",
+      "Python",
+      "trigram"
+    ],
+    "file": "amber-kb-local-library.md",
+    "excerpt": "纯 Python + SQLite FTS5 trigram，纯本地零订阅：16478 个文件 + WorkBuddy/Codex 共 147 段 AI 对话炼成一个检索入口，中文全文搜索，成本 0 元。含 scan 清理差点蒸发 55% 库的真实踩坑。",
+    "source": "https://blog.csdn.net/m0_67166125/article/details/166947568"
+  },
+  {
+    "title": "读书报告（二）：《运算放大器从入门到精通》第 5-8 章学习笔记",
+    "date": "2026-08-16",
+    "category": "学习笔记",
+    "tags": [
+      "运放",
+      "模电",
+      "读书笔记",
+      "嵌入式"
+    ],
+    "file": "reading-opamp-2.md",
+    "excerpt": "《运算放大器从入门到精通》第 5-8 章学习笔记：频率特性、稳定性补偿与实际应用电路。",
+    "source": "https://blog.csdn.net/m0_67166125/article/details/163802586"
+  },
+  {
+    "title": "读书报告（一）：《运算放大器从入门到精通》第 1-4 章学习笔记",
+    "date": "2026-08-16",
+    "category": "学习笔记",
+    "tags": [
+      "运放",
+      "模电",
+      "读书笔记",
+      "嵌入式"
+    ],
+    "file": "reading-opamp-1.md",
+    "excerpt": "《运算放大器从入门到精通》第 1-4 章学习笔记：理想运放、负反馈、虚短虚断与基础电路。",
+    "source": "https://blog.csdn.net/m0_67166125/article/details/163802553"
+  },
+  {
+    "title": "把私有 AI Agent 摁在 AMD 显卡上跑：Radeon-Assistant「磐石」实战实录",
+    "date": "2026-08-14",
+    "category": "AI 实战",
+    "tags": [
+      "AMD",
+      "ROCm",
+      "AI Agent",
+      "Radeon",
+      "私有部署"
+    ],
+    "file": "panshi-amd-agent.md",
+    "excerpt": "私有 AI Agent 摁在 AMD 显卡上跑：Radeon-Assistant「磐石」的完整实战记录。",
+    "source": "https://blog.csdn.net/m0_67166125/article/details/163761301"
+  },
+  {
+    "title": "魅蓝 Note2 折腾记：从刷机失败到部署个人博客",
+    "date": "2026-06-27",
+    "category": "折腾",
+    "tags": [
+      "折腾",
+      "Android",
+      "博客"
+    ],
+    "file": "note2-blog-journey.md",
+    "excerpt": "一台 2015 年的魅蓝 Note2，一台刷废的 MX4 Pro，一段从刷机到部署个人博客的折腾之旅。Termux、KSWeb、内网穿透，老设备的第二春。"
+  },
+  {
     "title": "Qwen3-0.6B + LoRA 明日方舟干员助手微调实录：AMD ROCm 单卡全流程",
     "date": "2026-06-25",
     "category": "AI 微调",
@@ -71,18 +141,6 @@
     "file": "amd-rocm-cloud-setup.md",
     "excerpt": "在 AMD 开发者云平台上部署 Google Gemma4-E4B-it 大模型的完整流程。通过 ROCm 环境验证 GPU 可用性，使用 ModelScope 下载模型权重（约 15G）。",
     "source": "https://blog.csdn.net/m0_67166125/article/details/162209300"
-  },
-  {
-    "title": "魅蓝 Note2 折腾记：从刷机失败到部署个人博客",
-    "date": "2026-06-27",
-    "category": "折腾",
-    "tags": [
-      "折腾",
-      "Android",
-      "博客"
-    ],
-    "file": "note2-blog-journey.md",
-    "excerpt": "一台 2015 年的魅蓝 Note2，一台刷废的 MX4 Pro，一段从刷机到部署个人博客的折腾之旅。Termux、KSWeb、内网穿透，老设备的第二春。"
   },
   {
     "title": "电子发烧友社区帖子合集",

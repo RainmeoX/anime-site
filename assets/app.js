@@ -63,7 +63,7 @@ const dateSplit = d => {
 // ---------- 加载文章 ----------
 async function loadPosts() {
   try {
-    const res = await fetch('posts/posts.json?v=5');
+    const res = await fetch('posts/posts.json?v=6');
     if (res.ok) { POSTS = await res.json(); return; }
   } catch (e) {}
   try {
